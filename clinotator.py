@@ -18,33 +18,50 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 import argparse, re
 import xml.etree.ElementTree as ET
 import pandas as pd
 import Bio.Entrez as Entz
+Entz.tool = 'Clinotator' # preferred by NCBI
+Entz.email = args.email
 
 # Args
 parser = argparse.ArgumentParser(
     prog = 'Clinotator' ,
+    formatter_class = argparse.RawTextHelpFormatter ,
     description =
     '''
     Copyright (C) 2017  Robert R Butler III
     This program comes with ABSOLUTELY NO WARRANTY. This is free software,
     and you are welcome to redistribute it under certain conditions.
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>
-    '''
-    )
+    along with this program.  If not, see <http://www.gnu.org/licenses/>\
+    ''')
 parser.add_argument( "--version" , action = 'version' , version = '%(prog)s v' + __version__ )
-parser.add_argument( "input" , metavar = ( '*.txt(vcf)' ) , help = "input file(s) (returns outfile for each)" , nargs = '+' )
+parser.add_argument( '--email', nargs = 1, help = 'NCBI requires an email for querying their databases')
+parser.add_argument( "input" , metavar = ( '*.file' ) , help = "input file(s) (returns outfile for each)" , nargs = '+' )
 parser.add_argument( "--type" , choices = [ 'vid' , 'rsid' , 'vcf' ] , nargs = 1 ,
-                    help = '''
-                    input file type: ClinVar Variation ID list
-                                     dbSNP rsID list
-                                     vcf file (output vcf generated)
-                    ''' )
+                    help =
+'''\
+input file type: vid - ClinVar Variation ID list
+                 rsid - dbSNP rsID list
+                 vcf - vcf file (output vcf generated)\
+''')
 args = parser.parse_args()
+
+# Functions
+def rsid_to_vid(rsid_list):
+    # import Bio.Entrez as Entz
+    # Entz.email = args.email
+    # Entz.tool = 'Clinotator' # preferred by NCBI
+
+    results = Entz.read(Entz.epost('snp' , id = ','.join(rsid_list)))
+    webenv = results['WebEnv']
+    query_key = results['QueryKey']
+    
+    return
+    
 
 
