@@ -18,40 +18,39 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-__version__ = "0.1.0"
-
-import argparse, re
-import xml.etree.ElementTree as ET
+import argparse, re, logging, sys
 import pandas as pd
 import Bio.Entrez as Entz
-Entz.tool = 'Clinotator' # preferred by NCBI
-Entz.email = args.email
 
-# Args
-parser = argparse.ArgumentParser(
-    prog = 'Clinotator' ,
-    formatter_class = argparse.RawTextHelpFormatter ,
-    description =
-    '''
-    Copyright (C) 2017  Robert R Butler III
-    This program comes with ABSOLUTELY NO WARRANTY. This is free software,
-    and you are welcome to redistribute it under certain conditions.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>\
-    ''')
-parser.add_argument( "--version" , action = 'version' , version = '%(prog)s v' + __version__ )
-parser.add_argument( '--email', nargs = 1, help = 'NCBI requires an email for querying their databases')
-parser.add_argument( "input" , metavar = ( '*.file' ) , help = "input file(s) (returns outfile for each)" , nargs = '+' )
-parser.add_argument( "--type" , choices = [ 'vid' , 'rsid' , 'vcf' ] , nargs = 1 ,
-                    help =
-'''\
-input file type: vid - ClinVar Variation ID list
-                 rsid - dbSNP rsID list
-                 vcf - vcf file (output vcf generated)\
-''')
-args = parser.parse_args()
+__version__ = "0.1.0"
 
-# Functions
+# error logging function plus config
+def error_handling():
+    # import logging
+    # import sys
+    # logging.basicConfig(level=logging.WARNING)
+    
+    return ' {}. {}, line: {}'.format(sys.exc_info()[0],
+                                           sys.exc_info()[1],
+                                           sys.exc_info()[2].tb_lineno)
+# argparse function
+def getargs():
+    parser = argparse.ArgumentParser(prog='clinotator', formatter_class=argparse.RawTextHelpFormatter,
+                                     description='Clinical interpretation of ambiguous ClinVar annotations')
+    parser.add_argument("--version", action='version', version='\n'.join(['Clinotator v'+__version__, __doc__]))
+    parser.add_argument("input", metavar=('file'), help="input file(s) (returns outfile for each)",
+                        nargs='+')
+    requiredNamed = parser.add_argument_group('required arguments')
+    requiredNamed.add_argument('-t', dest='type', choices=['vid', 'rsid', 'vcf'], required=True,
+                        help='vid - ClinVar Variation ID list\n'
+                        'rsid - dbSNP rsID list\n'
+                        'vcf - vcf file (output vcf generated)')
+    requiredNamed.add_argument('-e', dest='email', required=True,
+                               help='NCBI requires an email for querying their databases')
+    return parser.parse_args()
+
+
+# looking up rsids and converting them to vids
 def rsid_to_vid(rsid_list):
     # import Bio.Entrez as Entz
     # Entz.email = args.email
@@ -63,5 +62,12 @@ def rsid_to_vid(rsid_list):
     
     return
     
+def main():
+    logging.basicConfig(level=logging.DEBUG)
+    args = getargs()
+    logging.debug('CLI inputs are {} {} {}'.format(args.type, args.email, args.input))
+    Entz.tool = 'Clinotator' # preferred by NCBI
+    Entz.email = args.email
 
-
+if __name__ == '__main__':
+    main()

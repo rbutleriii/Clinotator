@@ -3,6 +3,17 @@
 # by Robert R Butler III
 # Library of python functions
 
+# error logging function plus config
+def error_handling():
+    import logging
+    import sys
+    logging.basicConfig(level=logging.WARNING)
+    
+    return ' {}. {}, line: {}'.format(sys.exc_info()[0],
+                                           sys.exc_info()[1],
+                                           sys.exc_info()[2].tb_lineno)
+
+
 # opens gzip text files
 def myopen(fn):
     import gzip

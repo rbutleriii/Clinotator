@@ -8,11 +8,11 @@ with open('LICENSE') as f:
 
 setup(
     name='clinotator',
-    version='0.1.0',
-    description='add desc later',
+    version=__version__,
+    description='Clinical interpretation of ambiguous ClinVar annotations',
     long_description=readme,
     author='Robert R Butler III',
-    author_email='rbutler@northshore.org'
+    author_email='rbutler@northshore.org',
     url='https://github.com/rbutleriii/clinotator',
     license=license,
     packages=find_packages(exclude=())
