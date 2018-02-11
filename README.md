@@ -1,7 +1,7 @@
-### Clinotator
+# Clinotator
 ## Synopsis
 
-# Clinical interpretation of ambiguous ClinVar annotations
+### Clinical interpretation of ambiguous ClinVar annotations
 
 This project takes variants as input and queries NCBI eutilities to generate scoring metrics. The overall goal is to generate annotations of use for given batches of variants to inform clinical interpretation. The metrics include:
 
@@ -33,7 +33,7 @@ required arguments:
   -e EMAIL           NCBI requires an email for querying their databases
 ```
 
-# Minimum Inputs
+### Minimum Inputs
 
 Three required bits of information: the type of input file, the file itself and your email address. The input comes as either a simple text list file of IDs, or a vcf. If a vcf(s) is selected, clinotator will generate an annotated output file. In all cases a tab-delimited table file will be produced.
 
@@ -44,11 +44,12 @@ While ClinVar has become an indispensable resource for clinical variant interpre
 
 ## Installation
 
-You can `git clone` or download the zipfile and unpack as you like. Add path to your ~/.bash_profile:
+You can `git clone` or download the zipfile and unpack as you like. Add the location to your ~/.bash_profile or:
 ```
- 
+export PATH=$PATH:path/to/folder/clinotator-x.x.x
+``` 
 
-# Dependencies
+### Dependencies
 
 The following from my pipenv:
 
@@ -65,7 +66,7 @@ pandas==0.22.0
 
 The python setup.py will attempt to use setuptools to install dependencies. Likely choose your own use case.
 
-# Proxy
+### Proxy
 
 biopython uses urllib to query eutilities (I believe now https only), so if you are behind a proxy add the following to your ~/.bash_profile:
 ```
