@@ -20,7 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import argparse, logging, sys
 import pandas as pd
-import getncbi
+import bin.getncbi as getncbi
+import bin.vcf as vcf
 from Bio import Entrez
 
 __version__ = "0.1.0"
