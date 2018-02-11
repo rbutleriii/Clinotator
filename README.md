@@ -14,7 +14,7 @@ These and other stats are returned on a per variant basis, in a table, and addit
 
 ## Code Example
 
-```
+```css
 usage: clinotator [-h] [--version] -t {vid,rsid,vcf} -e EMAIL file [file ...]
 
 Clinical interpretation of ambiguous ClinVar annotations
@@ -44,9 +44,10 @@ While ClinVar has become an indispensable resource for clinical variant interpre
 
 ## Installation
 
-You can `git clone` or download the zipfile and unpack as you like. Add the location to your ~/.bash_profile or:
+Implemented in python3 (tested >=3.5). You can `git clone` or download the zipfile and unpack as you like. Add the location to your ~/.bash_profile or:
+
 ```
-export PATH=$PATH:path/to/folder/clinotator-x.x.x
+export PATH=$PATH:path/to/folder/clinotator
 ``` 
 
 ### Dependencies
@@ -69,23 +70,59 @@ The python setup.py will attempt to use setuptools to install dependencies. Like
 ### Proxy
 
 biopython uses urllib to query eutilities (I believe now https only), so if you are behind a proxy add the following to your ~/.bash_profile:
+
 ```
 export HTTP_PROXY=http://username:password@proxy.mydomain.com:8080
 export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
 ```
-or with authentication:
-## API Reference
 
-Depending on the size of the project, if it is small and simple enough the reference docs can be added to the README. For medium size to larger projects it is important to at least provide a link to where the API reference docs live.
+## Details on metrics
+
+### ClinVar Metrics
+
+ClinVar Clinical Significance (**CTCS**)
+: ...
+ClinVar Stars (**CTSZ**)
+: ...
+ClinVar \# of Clinical Assertions (**CTNA**)
+: ...
+ClinVar Diseases (**CTDS**)
+: ...
+
+### Clinotator Metrics
+
+Clinotator Raw Score (**CTRS**)
+: ...
+Average Clinical Assertion Age (**CTAA**)
+: ...
+Clinotator Weighted Significance (**CTWS**)
+: ...
+Reclassification Recommendation (**CTRR**)
+: ...
 
 ## Tests
 
-Describe and show how to run the tests with code examples.
+For the main package, the following tests check the installation:
 
-## Contributors
-
-Let people know how they can dive into the project, include important links to things like issue trackers, irc, twitter accounts if applicable.
+```
+```
 
 ## License
 
-A short snippet describing the license (MIT, Apache, etc.)
+Copyright (C) 2017  Robert R Butler III
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+## References
+
