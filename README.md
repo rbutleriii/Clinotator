@@ -35,8 +35,11 @@ required arguments:
 
 ### Minimum Inputs
 
-Three required bits of information: the type of input file, the file itself and your email address. The input comes as either a simple text list file of IDs, or a vcf. If a vcf(s) is selected, clinotator will generate an annotated output file. In all cases a tab-delimited table file will be produced.
+Three required bits of information: (1) the type of input file, (2) the file itself and (3) your email address. The input comes as either a simple text ID list file, or a vcf. If a vcf(s) is selected, clinotator will generate an annotated output file. In all cases a tab-delimited table file will be produced. The email is required by NCBI/biopython as NCBI enforces a strict 3 queries per second limit. Before they ban your IP address they will attempt to contact you, but that should not be a problem as clinotator uses batch queries and the history server.
 
+### Optional Arguments
+
+In progress...
 
 ## Motivation
 
@@ -80,31 +83,35 @@ export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
 
 ### ClinVar Metrics
 
-ClinVar Clinical Significance (**CTCS**)
-:  In progress...
+<dl>
+	<dt>ClinVar Clinical Significance (**CTCS**)</dt>
+	<dd>In progress...</dd>
 
-ClinVar Stars (**CTSZ**)
-:  In progress...
+	<dt>ClinVar Stars (**CTSZ**)</dt>
+	<dd>In progress...</dd>
 
-ClinVar \# of Clinical Assertions (**CTNA**)
-:  In progress...
+	<dt>ClinVar \# of Clinical Assertions (**CTNA**)</dt>
+	<dd>In progress...</dd>
 
-ClinVar Diseases (**CTDS**)
-:  In progress...
+	<dt>ClinVar Diseases (**CTDS**)</dt>
+	<dd>In progress...</dd>
+</dl>
 
 ### Clinotator Metrics
 
-Clinotator Raw Score (**CTRS**)
-:  In progress...
+<dl>
+	<dt>Clinotator Raw Score (**CTRS**)</dt>
+	<dd>In progress...</dd>
 
-Average Clinical Assertion Age (**CTAA**)
-:  In progress...
+	<dt>Average Clinical Assertion Age (**CTAA**)</dt>
+	<dd>In progress...</dd>
 
-Clinotator Weighted Significance (**CTWS**)
-:  In progress...
+	<dt>Clinotator Weighted Significance (**CTWS**)</dt>
+	<dd>In progress...</dd>
 
-Reclassification Recommendation (**CTRR**)
-:  In progress...
+	<dt>Reclassification Recommendation (**CTRR**)</dt>
+	<dd>In progress...</dd>
+</dl>
 
 ## Tests
 
