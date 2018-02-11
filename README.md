@@ -86,13 +86,16 @@ export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
 <dl>
 	<dt>ClinVar Clinical Significance (**CTCS**)</dt>
 	<dd>In progress...</dd>
-
+</dl>
+<dl>
 	<dt>ClinVar Stars (**CTSZ**)</dt>
 	<dd>In progress...</dd>
-
+</dl>
+<dl>
 	<dt>ClinVar \# of Clinical Assertions (**CTNA**)</dt>
 	<dd>In progress...</dd>
-
+</dl>
+<dl>
 	<dt>ClinVar Diseases (**CTDS**)</dt>
 	<dd>In progress...</dd>
 </dl>
@@ -102,13 +105,16 @@ export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
 <dl>
 	<dt>Clinotator Raw Score (**CTRS**)</dt>
 	<dd>In progress...</dd>
-
+</dl>
+<dl>
 	<dt>Average Clinical Assertion Age (**CTAA**)</dt>
 	<dd>In progress...</dd>
-
+</dl>
+<dl>
 	<dt>Clinotator Weighted Significance (**CTWS**)</dt>
 	<dd>In progress...</dd>
-
+</dl>
+<dl>
 	<dt>Reclassification Recommendation (**CTRR**)</dt>
 	<dd>In progress...</dd>
 </dl>
