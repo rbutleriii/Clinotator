@@ -28,13 +28,10 @@ __version__ = "0.1.0"
 
 # error logging function plus config
 def error_handling():
-    # import logging
-    # import sys
-    # logging.basicConfig(level=logging.WARNING)
-    
     return ' {}. {}, line: {}'.format(sys.exc_info()[0],
                                            sys.exc_info()[1],
                                            sys.exc_info()[2].tb_lineno)
+
 # argparse function
 def getargs():
     # import argparse
@@ -53,6 +50,7 @@ def getargs():
                                help='NCBI requires an email for querying their databases')
     return parser.parse_args()
 
+# # # # how to handle file types 
 def input_selection(type, file, vid_list):
     try:
         if type == 'vid':
@@ -62,7 +60,7 @@ def input_selection(type, file, vid_list):
         
         elif type == 'rsid':
             with open(file) as f:
-                rsid_list = [line.rstrip('\n') for line in f]
+                rsid_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
                 getncbi.rsid_to_vid(rsid_list, vid_list)
             return vid_list
         
@@ -77,7 +75,7 @@ def input_selection(type, file, vid_list):
         logging.fatal(e)
         print('Unable to open file, Error {}: {}'.format(errno,strerror))
 
-# takes python object from clinvar and puts info into dataframe
+# # # # takes python object from clinvar and puts info into dataframe
 def parse_to_tbl(query_results):
     # build dataframe
     for result in query_results:
@@ -85,12 +83,20 @@ def parse_to_tbl(query_results):
         parse_submissions(submission_subtree)
     return
 
-# takes subtree from main for submitters and calculates submission stats
+# # # # takes subtree from main for submitters and calculates submission stats
 def parse_submissions(submission_subtree):
     # build dataframe
     # aggregate functions for data
     return
 
+# # # # outfile generation with vcf option
+def output_files(type, ):
+    # tbl output
+    if type == 'vcf':
+        vcf.output_vcf()
+    return
+    
+# # # # 
 def main():
     logging.basicConfig(level=logging.DEBUG)
     
@@ -104,7 +110,7 @@ def main():
         input_selection(args.type, file, vid_list)
         logging.debug('vid_list to query clinvar: total {} items'.format(len(vid_list)))
         getncbi.get_entrez_xml(vid_list, query_results)
-        logging.debug('the keys for query_results[0]: {}'.format(query_results))
+        logging.debug('the keys for query_results[0]: {}'.format(query_results[0].keys()))
     
 
 if __name__ == '__main__':
