@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import clinotator
 
 with open('README.md') as f:
     readme = f.read()
@@ -8,7 +9,7 @@ with open('LICENSE') as f:
 
 setup(
     name='clinotator',
-    version=__version__,
+    version=clinotator.__version__,
     description='Clinical interpretation of ambiguous ClinVar annotations',
     long_description=readme,
     author='Robert R Butler III',
