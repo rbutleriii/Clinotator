@@ -10,6 +10,7 @@ See main, eventually tests will be added for this module
 
 import vcf
 
+
 # # # # loading the vcf using pyvcf
 def load_vcf():
     return

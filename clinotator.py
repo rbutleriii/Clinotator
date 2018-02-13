@@ -24,56 +24,62 @@ import bin.getncbi as getncbi
 import bin.vcf as vcf
 from Bio import Entrez
 
+
 __version__ = "0.1.0"
 
 # error logging function plus config
 def error_handling():
-    return ' {}. {}, line: {}'.format(sys.exc_info()[0],
-                                           sys.exc_info()[1],
-                                           sys.exc_info()[2].tb_lineno)
+    return ' {}. {}, line: {}'.format(sys.exc_info()[0], sys.exc_info()[1],
+                                      sys.exc_info()[2].tb_lineno)
 
 # argparse function
 def getargs():
-    # import argparse
-    
-    parser = argparse.ArgumentParser(prog='clinotator', formatter_class=argparse.RawTextHelpFormatter,
-                                     description='Clinical interpretation of ambiguous ClinVar annotations')
-    parser.add_argument("--version", action='version', version='\n'.join(['Clinotator v'+__version__, __doc__]))
-    parser.add_argument("input", metavar=('file'), help="input file(s) (returns outfile for each)",
-                        nargs='+')
+    parser = argparse.ArgumentParser(prog='clinotator',
+                                     formatter_class=
+                                     argparse.RawTextHelpFormatter,
+                                     description='Clinical interpretation ' \
+                                     'of ambiguous ClinVar annotations')
+    parser.add_argument("--version", action='version',
+                        version='\n'.join(['Clinotator v'
+                                          + __version__, __doc__]))
+    parser.add_argument("input", metavar=('file'), nargs='+',
+                        help="input file(s) (returns outfile for each)")
     requiredNamed = parser.add_argument_group('required arguments')
-    requiredNamed.add_argument('-t', dest='type', choices=['vid', 'rsid', 'vcf'], required=True,
-                        help='vid - ClinVar Variation ID list\n'
-                        'rsid - dbSNP rsID list\n'
-                        'vcf - vcf file (output vcf generated)')
+    requiredNamed.add_argument('-t', dest='type', required=True,
+                               choices=['vid', 'rsid', 'vcf'],
+                               help='vid - ClinVar Variation ID list\n' \
+                                    'rsid - dbSNP rsID list\n' \
+                                    'vcf - vcf file (output vcf generated)')
     requiredNamed.add_argument('-e', dest='email', required=True,
-                               help='NCBI requires an email for querying their databases')
+                               help='NCBI requires an email for querying '\
+                                    'their databases')
     return parser.parse_args()
 
 # # # # how to handle file types 
-def input_selection(type, file, vid_list):
+def input_selection(file_type, file, query_results):
     try:
-        if type == 'vid':
-            with open(file) as f:
-                vid_list = [line.rstrip('\n') for line in f]
-            return vid_list
+        with open(file) as f:
+            id_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
+
+            if file_type == 'vid':
+                getncbi.get_ncbi_xml(file_type, id_list, query_results)
         
-        elif type == 'rsid':
-            with open(file) as f:
-                rsid_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
-                getncbi.rsid_to_vid(rsid_list, vid_list)
-            return vid_list
+            elif file_type == 'rsid':
+                getncbi.get_ncbi_xml(file_type, id_list, query_results)
         
-        elif type == 'vcf':
-            with open(file) as f:
+            elif file_type == 'vcf':
                 print('vcf parsing is not yet implemented, coming soon...')
                 sys.exit()
                 # implement vcf object? or generate list
+        return
 
     except IOError as e:
         errno, strerror = e.args
         logging.fatal(e)
         print('Unable to open file, Error {}: {}'.format(errno,strerror))
+    
+    except:
+        logging.fatal(error_handling())
 
 # # # # takes python object from clinvar and puts info into dataframe
 def parse_to_tbl(query_results):
@@ -90,28 +96,30 @@ def parse_submissions(submission_subtree):
     return
 
 # # # # outfile generation with vcf option
-def output_files(type, ):
+def output_files(file_type, ):
     # tbl output
-    if type == 'vcf':
+    if file_type == 'vcf':
         vcf.output_vcf()
     return
     
 # # # # 
 def main():
     logging.basicConfig(level=logging.DEBUG)
-    
     args = getargs()
     Entrez.email = args.email
-    logging.debug('CLI inputs are {} {} {}'.format(args.type, args.email, args.input))
+    logging.debug('CLI inputs are {} {} {}'.format(args.type, args.email,
+                                                   args.input))
     
     for file in args.input:
-        vid_list = []
         query_results = []
-        input_selection(args.type, file, vid_list)
-        logging.debug('vid_list to query clinvar: total {} items'.format(len(vid_list)))
-        getncbi.get_entrez_xml(vid_list, query_results)
-        logging.debug('the keys for query_results[0]: {}'.format(query_results[0].keys()))
-    
+        input_selection(args.type, file, query_results)
+        logging.debug('the total # of query_results: {}'
+                      .format(len(query_results)))
+        # parse_to_tbl(query_results)
+        # logging.debug('something')
+        # output_files(tbl, vcf)
+        # logging.debug('something')
+        sys.exit()
 
 if __name__ == '__main__':
     main()

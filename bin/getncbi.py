@@ -9,71 +9,98 @@ See main, eventually tests will be added for this module
 '''
 
 import logging
+import sys
 from Bio import Entrez
 try:
     from urllib.error import HTTPError  # for Python 3
 except ImportError:
     from urllib2 import HTTPError  # for Python 2
 
+
 Entrez.tool = 'Clinotator' # preferred by NCBI
-batch_size = 3
+batch_size = 8
 
-# looking up rsids and converting them to vids
-def rsid_to_vid(rsid_list, vid_list):
-    logging.debug('rsid_list {}'.format(rsid_list))
-    webenv1, query_key1 = post_ncbi(rsid_list, 'snp')
+# getting xml files for an id_list
+def get_ncbi_xml(file_type, id_list, query_results):
+    logging.debug('{} list -> {}'.format(file_type, id_list))
     staging_list = []
-    batch_ncbi('elink', staging_list, rsid_list, 3, dbfrom='snp', db='clinvar', webenv=webenv1,
-               query_key=query_key1, LinkName='snp_clinvar')
-    [[vid_list.append(link['Id']) for link in batch['LinkSetDb'][0]['Link']]for batch in staging_list] 
-    logging.debug('vid_list -> {}'.format(vid_list))
-    
-    return
 
-# getting xml files for vid_list
-def get_entrez_xml(vid_list, query_results):
-    logging.debug('vid_list {}'.format(vid_list))
-    webenv1, query_key1 = post_ncbi(vid_list, 'clinvar')
-    staging_list = []
-    batch_ncbi('efetch', staging_list, vid_list, 3, db='clinvar', rettype='variation', webenv=webenv1,
+    if file_type == 'rsid':
+        webenv2, query_key2 = post_ncbi(file_type, 'epost', db='snp',
+                                        id=",".join(id_list))
+        webenv1, query_key1 = post_ncbi(file_type, 'elink', db='clinvar',
+                                        webenv=webenv2, query_key=query_key2,
+                                        dbfrom='snp', linkname='snp_clinvar',
+                                        cmd='neighbor_history')
+    elif file_type == 'vid':
+        webenv1, query_key1 = post_ncbi(file_type, 'epost', db='clinvar',
+                                        id=",".join(id_list))
+    else:
+        logging.fatal('Error: Incorrect file_type argument in get_rsid_xml ' \
+                      '-> {}'.format(file_type))
+
+    batch_ncbi('efetch', staging_list, id_list, db='clinvar',
+               rettype='uilist', retmax=batch_size, webenv=webenv1,
                query_key=query_key1)
     [query_results.append(batch) for batch in staging_list] 
     logging.debug('batches run -> {}'.format(len(query_results)))
-    
     return
 
-# Posts list to history for target db
-def post_ncbi(post_list, db):
-    query = Entrez.read(Entrez.epost(db, id=",".join(post_list)))
-    webenv1 = query['WebEnv']
-    query_key1 = query['QueryKey']
-    logging.debug('returned webenv: {} returned query key: {}'.format(webenv1, query_key1))
+# epost or elink list to history for target db. 
+def post_ncbi(file_type, query_type, **kwargs):
+    logging.debug('{} to ncbi using kwargs: {}'.format(query_type, kwargs))
+    handle = getattr(Entrez, query_type)(**kwargs)
+    query = Entrez.read(handle)
+    logging.debug(query)
+    handle.close()
+
+    if file_type == 'rsid' and query_type == 'elink':
+        webenv = query[0]['WebEnv']
+        query_key = query[0]['LinkSetDbHistory'][0]['QueryKey']
+    else:    
+        webenv = query['WebEnv']
+        query_key = query['QueryKey']
+
+    logging.debug('returned webenv: {} and query key: {}'.format(webenv,
+                                                                 query_key))
+    return webenv, query_key
     
-    return webenv1, query_key1
-    
-# Utilized for batching from ncbi. Use history variables in kwargs. HTTPError and retry 
-def batch_ncbi(query_type, return_list, post_list, batch_size, **kwargs):
-    count = len(post_list)
-    logging.debug('{} run with {}'.format(query_type, kwargs))
+# Utilized for batching from ncbi. HTTPError and retry 
+def batch_ncbi(query_type, query_results, id_list, **kwargs):
+    count = len(id_list)
+
     for start in range(0, count, batch_size):
         end = min(count, start+batch_size)
+        logging.debug('{} run with {}'.format(query_type,
+                                              dict(retstart=start, **kwargs)))
         print("Going to download record %i to %i" % (start+1, end))
         attempt = 0
         while attempt < 3:
             attempt += 1
+
             try:
-                fetch_handle = getattr(Entrez, query_type)(**kwargs)
+                fetch_handle = getattr(Entrez,
+                                       query_type)(**dict(retstart=start, **kwargs))
+
+            except ValueError as oops:
+                logging.warning('Likely total = batch size')
+                break
+
             except HTTPError as err:
-                logging.debug(err)
                 if 500 <= err.code <= 599:
                     print("Received error from server %s" % err)
                     print("Attempt %i of 3" % attempt)
+                    logging.debug(err)
                     time.sleep(15)
+                elif err.code == 400:
+                    logging.warning(err)
+                    sys.tracebacklimit = None
+                    break
                 else:
                     raise
+
         data = Entrez.read(fetch_handle)
         print(data)
         fetch_handle.close()
-        return_list.append(data[0])
-    
+        query_results.append(data[0])
     return
