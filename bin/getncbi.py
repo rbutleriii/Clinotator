@@ -18,7 +18,7 @@ except ImportError:
 
 
 Entrez.tool = 'Clinotator' # preferred by NCBI
-batch_size = 8
+batch_size = 3
 
 # getting xml files for an id_list
 def get_ncbi_xml(file_type, id_list, query_results):
@@ -98,9 +98,14 @@ def batch_ncbi(query_type, query_results, id_list, **kwargs):
                     break
                 else:
                     raise
-
-        data = Entrez.read(fetch_handle)
-        print(data)
-        fetch_handle.close()
-        query_results.append(data[0])
+        # Ideally Entrez.read would import as python object, and validate with
+        # ClinVar, but ClinVar no longer declares DOCTYPE for validation in
+        # their xml returns. They have .xsd for this purpose, but users
+        # downloading their own validation file is silly, plus there is no
+        # option with Entrez.read to specify the .xsd file. Ultimately, the
+        # best option for now is to utilize ElementTree for parsing. >Revisit<
+        # data = Entrez.read(fetch_handle)
+        # print(data)
+        # fetch_handle.close()
+        query_results.append(fetch_handle.read())
     return

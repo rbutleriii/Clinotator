@@ -2,6 +2,7 @@
 
 '''
 Below are the functions for manipulation of vcf files
+
 Clinotator - Clinical interpretation of ambiguous ClinVar annotations
 Copyright (C) 2017  Robert R Butler III
 

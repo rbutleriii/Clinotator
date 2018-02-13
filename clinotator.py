@@ -18,14 +18,18 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import argparse, logging, sys
+
+import argparse
+import logging
+import sys
 import pandas as pd
 import bin.getncbi as getncbi
 import bin.vcf as vcf
+import bin.variation as variation
 from Bio import Entrez
 
 
-__version__ = "0.1.0"
+__version__ = "0.0.1"
 
 # error logging function plus config
 def error_handling():
@@ -42,6 +46,9 @@ def getargs():
     parser.add_argument("--version", action='version',
                         version='\n'.join(['Clinotator v'
                                           + __version__, __doc__]))
+    parser.add_argument('-o', dest='outprefix', default='clinotator.file',
+                        nargs='?', const='clinotator.file',
+                        help='Choose an alternate prefix for outfiles')
     parser.add_argument("input", metavar=('file'), nargs='+',
                         help="input file(s) (returns outfile for each)")
     requiredNamed = parser.add_argument_group('required arguments')
@@ -81,43 +88,43 @@ def input_selection(file_type, file, query_results):
     except:
         logging.fatal(error_handling())
 
-# # # # takes python object from clinvar and puts info into dataframe
-def parse_to_tbl(query_results):
-    # build dataframe
-    for result in query_results:
-        # grab easy data
-        parse_submissions(submission_subtree)
-    return
-
-# # # # takes subtree from main for submitters and calculates submission stats
-def parse_submissions(submission_subtree):
-    # build dataframe
-    # aggregate functions for data
-    return
-
 # # # # outfile generation with vcf option
-def output_files(file_type, ):
-    # tbl output
+def output_files(file_type, variant_objects, outprefix):
+    columns = ['VID', 'RSID', 'CTCS', 'CTSZ', 'CTNA', 'CTDS', 'CTLU',
+               'CTS', 'CTAA', 'CTWS', 'CTRR']
+    result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columns}
+        for variant in variant_objects])
+    result_tbl.sort_values(['VID', 'RSID'], inplace=True)
+    result_tbl.drop_duplicates(inplace=True)
+    result_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
+                      index=False, tupleize_cols=True)
     if file_type == 'vcf':
         vcf.output_vcf()
     return
     
-# # # # 
 def main():
     logging.basicConfig(level=logging.DEBUG)
     args = getargs()
     Entrez.email = args.email
-    logging.debug('CLI inputs are {} {} {}'.format(args.type, args.email,
-                                                   args.input))
+    logging.debug('CLI inputs are {} {} {} {}'
+                  .format(args.type, args.email, args.input, args.outprefix))
     
     for file in args.input:
         query_results = []
+        variant_objects = []
         input_selection(args.type, file, query_results)
         logging.debug('the total # of query_results: {}'
                       .format(len(query_results)))
-        # parse_to_tbl(query_results)
-        # logging.debug('something')
-        # output_files(tbl, vcf)
+        
+        for batch in query_results:
+            clinvarresult = ET.fromstring(batch)
+            for variationreport in clinvarresult.iter('VariationReport'):
+                variant = VariationClass(variationreport)
+                variant_objects.append(variant)
+                # logging.debug('something')
+        
+        outprefix = args.outprefix
+        output_files(args.type, variant_objects, outprefix)
         # logging.debug('something')
         sys.exit()
 
