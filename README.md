@@ -84,20 +84,28 @@ export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
 ### ClinVar Metrics
 
 <dl>
-	<dt>ClinVar Clinical Significance (**CTCS**)</dt>
-	<dd>In progress...</dd>
+	<dt>ClinVar Clinical Significance (**CVCS**)</dt>
+	<dd>Clinical significance reported by ClinVar.</dd>
 </dl>
 <dl>
-	<dt>ClinVar Stars (**CTSZ**)</dt>
-	<dd>In progress...</dd>
+	<dt>ClinVar Stars (**CVSZ**)</dt>
+	<dd>Star rating given by clinvar. Ranges from zero to four.</dd>
 </dl>
 <dl>
-	<dt>ClinVar \# of Clinical Assertions (**CTNA**)</dt>
-	<dd>In progress...</dd>
+	<dt>ClinVar Number of Clinical Assertions (**CVNA**)</dt>
+	<dd>The number of Clinvar Submissions possessing a clinical assertion. Most assertions meet or exceed the guidelines put for by the American College of Medical Genetics and Genomics (ACMG).</dd>
 </dl>
 <dl>
-	<dt>ClinVar Diseases (**CTDS**)</dt>
-	<dd>In progress...</dd>
+	<dt>ClinVar Conditions/Diseases (**CVDS**)</dt>
+	<dd>Conditions reported to be associated with this variant.</dd>
+</dl>
+<dl>
+	<dt>ClinVar Last Update (**CVLU**)</dt>
+	<dd>The date the variation report was last updated.</dd>
+</dl>
+<dl>
+	<dt>ClinVar Variant Type (**CVVT**)</dt>
+	<dd>The type of variation in ClinVar. Currently defined as either "Simple" or "Haplotype" if multiple AlleleIDs are involved.</dd>
 </dl>
 
 ### Clinotator Metrics

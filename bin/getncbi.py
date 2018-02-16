@@ -10,7 +10,7 @@ See main, eventually tests will be added for this module
 
 import logging
 import sys
-from Bio import Entrez
+import Bio.Entrez as Entrez
 try:
     from urllib.error import HTTPError  # for Python 3
 except ImportError:
@@ -18,7 +18,7 @@ except ImportError:
 
 
 Entrez.tool = 'Clinotator' # preferred by NCBI
-batch_size = 3
+batch_size = 4500
 
 # getting xml files for an id_list
 def get_ncbi_xml(file_type, id_list, query_results):
@@ -40,7 +40,7 @@ def get_ncbi_xml(file_type, id_list, query_results):
                       '-> {}'.format(file_type))
 
     batch_ncbi('efetch', staging_list, id_list, db='clinvar',
-               rettype='uilist', retmax=batch_size, webenv=webenv1,
+               rettype='variation', retmax=batch_size, webenv=webenv1,
                query_key=query_key1)
     [query_results.append(batch) for batch in staging_list] 
     logging.debug('batches run -> {}'.format(len(query_results)))

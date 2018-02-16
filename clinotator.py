@@ -19,17 +19,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 
+import os
 import argparse
 import logging
 import sys
+import datetime
 import pandas as pd
+import numpy as np
+import Bio.Entrez as Entrez
 import bin.getncbi as getncbi
 import bin.vcf as vcf
 import bin.variation as variation
-from Bio import Entrez
 
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 # error logging function plus config
 def error_handling():
@@ -46,8 +49,8 @@ def getargs():
     parser.add_argument("--version", action='version',
                         version='\n'.join(['Clinotator v'
                                           + __version__, __doc__]))
-    parser.add_argument('-o', dest='outprefix', default='clinotator.file',
-                        nargs='?', const='clinotator.file',
+    parser.add_argument('-o', dest='outprefix', default='clinotator',
+                        nargs='?',
                         help='Choose an alternate prefix for outfiles')
     parser.add_argument("input", metavar=('file'), nargs='+',
                         help="input file(s) (returns outfile for each)")
@@ -62,7 +65,7 @@ def getargs():
                                     'their databases')
     return parser.parse_args()
 
-# # # # how to handle file types 
+# how to handle file types 
 def input_selection(file_type, file, query_results):
     try:
         with open(file) as f:
@@ -88,16 +91,44 @@ def input_selection(file_type, file, query_results):
     except:
         logging.fatal(error_handling())
 
-# # # # outfile generation with vcf option
+# exploding list cells in dataframe into separate rows.
+def explode(df, lst_cols, fill_value=''):
+    # make sure `lst_cols` is a list
+    if lst_cols and not isinstance(lst_cols, list):
+        lst_cols = [lst_cols]
+    # all columns except `lst_cols`
+    idx_cols = df.columns.difference(lst_cols)
+
+    # calculate lengths of lists
+    lens = df[lst_cols[0]].str.len()
+
+    if (lens > 0).all():
+        # ALL lists in cells aren't empty
+        return pd.DataFrame({
+            col:np.repeat(df[col].values, df[lst_cols[0]].str.len())
+            for col in idx_cols
+        }).assign(**{col:np.concatenate(df[col].values) for col in lst_cols}) \
+          .loc[:, df.columns]
+    else:
+        # at least one list in cells is empty
+        return pd.DataFrame({
+            col:np.repeat(df[col].values, df[lst_cols[0]].str.len())
+            for col in idx_cols
+        }).assign(**{col:np.concatenate(df[col].values) for col in lst_cols}) \
+          .append(df.loc[lens==0, idx_cols]).fillna(fill_value) \
+          .loc[:, df.columns]
+
+# outfile generation with vcf option
 def output_files(file_type, variant_objects, outprefix):
-    columns = ['VID', 'RSID', 'CTCS', 'CTSZ', 'CTNA', 'CTDS', 'CTLU',
-               'CTS', 'CTAA', 'CTWS', 'CTRR']
-    result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columns}
+    columnz = ['VID', 'CVVT', 'RSID', 'CVMA', 'vcfmatch', 'CVCS', 'CVSZ',
+               'CVNA', 'CVDS', 'CVLU', 'CTRS', 'CTAA', 'CTWS', 'CTRR']
+    result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
         for variant in variant_objects])
-    result_tbl.sort_values(['VID', 'RSID'], inplace=True)
-    result_tbl.drop_duplicates(inplace=True)
-    result_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
-                      index=False, tupleize_cols=True)
+    result_tbl = result_tbl[columnz].sort_values('VID')
+    vcf_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='.')
+    vcf_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
+                      index=False)
+
     if file_type == 'vcf':
         vcf.output_vcf()
     return
@@ -116,16 +147,14 @@ def main():
         logging.debug('the total # of query_results: {}'
                       .format(len(query_results)))
         
-        for batch in query_results:
-            clinvarresult = ET.fromstring(batch)
-            for variationreport in clinvarresult.iter('VariationReport'):
-                variant = VariationClass(variationreport)
-                variant_objects.append(variant)
-                # logging.debug('something')
+        variation.query_parsing(variant_objects, query_results)
+        logging.debug('the total # of variant_objects: {}'
+                      .format(len(variant_objects)))
         
-        outprefix = args.outprefix
+        base = os.path.basename(file)
+        outprefix = args.outprefix + '.' + os.path.splitext(base)[0]
         output_files(args.type, variant_objects, outprefix)
-        # logging.debug('something')
+        logging.debug('file written to {}.tsv'.format(outprefix))
         sys.exit()
 
 if __name__ == '__main__':
