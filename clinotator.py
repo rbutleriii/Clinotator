@@ -125,7 +125,7 @@ def output_files(file_type, variant_objects, outprefix):
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
         for variant in variant_objects])
     result_tbl = result_tbl[columnz].sort_values('VID')
-    vcf_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='.')
+    vcf_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='-')
     vcf_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
                       index=False)
 
@@ -134,7 +134,7 @@ def output_files(file_type, variant_objects, outprefix):
     return
     
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, filename="logfile.log")
     args = getargs()
     Entrez.email = args.email
     logging.debug('CLI inputs are {} {} {} {}'

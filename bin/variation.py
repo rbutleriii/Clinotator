@@ -23,7 +23,6 @@ def query_parsing(variant_objects, query_results):
         clinvarresult = ET.fromstring(batch)
         for var_index, variationreport in enumerate(clinvarresult):
             variant = VariationClass(variationreport)
-            pprint.pprint(variant.__dict__)
             variant_objects.append(variant)
         logging.debug('{} variant objects parsed in batch {}'
                       .format(var_index + 1, batch_index + 1))
@@ -59,9 +58,17 @@ class VariationClass:
         vcf_match = []
         
         for index, alleles in enumerate(variationreport.findall('./Allele')):
-            RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]').get('ID'))
-            Alt.append(alleles.find('./SequenceLocation[@Assembly="GRCh38"]')
+            try:
+                RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]').get('ID'))
+            except:
+                RS.append('')
+            
+            try:
+                Alt.append(alleles.find('./SequenceLocation[@Assembly="GRCh38"]')
                        .get('alternateAllele'))
+            except:
+                Alt.append('')
+                
             vcf_match.append('{}|{}'.format(RS[index], Alt[index]))
             
         self.RSID = RS
@@ -151,16 +158,21 @@ class VariationClass:
             sig_value = key_test(significance, sigval_key)
                 
             if score > 0 and sig_value != 0:
-                age = calculate_age(assertion.find('./ClinicalSignificance')
+                try:
+                    age = calculate_age(assertion.find('./ClinicalSignificance')
                                     .get('DateLastEvaluated'))
+                except:
+                    logging.warn('{} has no assertion date!'.format(self.VID))
+                    break
+                    
                 age_list.append(age)
                 raw_score.append(score * sig_value * self.weighted_age(age))
 
         self.CTRS = sum(raw_score)
         self.CVNA = len(age_list)
         self.CTAA = numpy.mean(age_list)
-        logging.debug('age list: {}'.format(age_list))
-        logging.debug('raw scores: {}'.format(raw_score))
+        logging.debug('age list size: {}, raw_score size: {}'
+                      .format(len(age_list), len(raw_score)))
     
     # calculating the analytical stats
     def analysis_stats(self):
