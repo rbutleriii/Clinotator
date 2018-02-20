@@ -65,7 +65,7 @@ def getargs():
                                     'their databases')
     return parser.parse_args()
 
-# how to handle file types 
+# how to handle file types, returns vcf_tbl or False for output 
 def input_selection(file_type, file, query_results):
     try:
         with open(file) as f:
@@ -73,15 +73,17 @@ def input_selection(file_type, file, query_results):
             if file_type == 'vid':
                 id_list = [line.rstrip('\n') for line in f]
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
+                return False
         
             elif file_type == 'rsid':
                 id_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
-        
+                return False
+            
             elif file_type == 'vcf':
-                # implement vcf object? or generate list
-                vcf_list, vcf_tbl = vcf.file_prep(f, outprefix)
-                getncbi.get_ncbi_xml(file_type, vcf_list, query_results)
+                vcf_list, vcf_tbl = vcf.vcf_prep(f, outprefix)
+                id_list = [item.lstrip('rs') for item in vcf_list]
+                getncbi.get_ncbi_xml(file_type, id_list, query_results)
                 return vcf_tbl
                 
     except IOError as e:
@@ -119,9 +121,9 @@ def explode(df, lst_cols, fill_value=''):
           .loc[:, df.columns]
 
 # outfile generation with vcf option
-def output_files(file_type, variant_objects, outprefix):
+def output_files(vcf_tbl, variant_objects, outprefix):
     columnz = ['VID', 'CVVT', 'RSID', 'CVMA', 'vcfmatch', 'CVCS', 'CVSZ',
-               'CVNA', 'CVDS', 'CVLU', 'CTRS', 'CTAA', 'CTWS', 'CTRR']
+               'CVNA', 'CVDS', 'CVLE', 'CTRS', 'CTAA', 'CTWS', 'CTRR']
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
         for variant in variant_objects])
     result_tbl = result_tbl[columnz].sort_values('VID')
@@ -129,7 +131,7 @@ def output_files(file_type, variant_objects, outprefix):
     out_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
                       index=False)
 
-    if file_type == 'vcf':
+    if vcf_tbl:
         vcf.output_vcf(out_tbl, vcf_tbl)
     return
     
@@ -146,7 +148,7 @@ def main():
         base = os.path.basename(file)
         outprefix = args.outprefix + '.' + os.path.splitext(base)[0]
 
-        input_selection(args.type, file, query_results)
+        vcf_tbl = input_selection(args.type, file, query_results)
         logging.debug('the total # of query_results: {}'
                       .format(len(query_results)))
         
@@ -154,7 +156,7 @@ def main():
         logging.debug('the total # of variant_objects: {}'
                       .format(len(variant_objects)))
         
-        output_files(args.type, variant_objects, outprefix)
+        output_files(vcf_tbl, variant_objects, outprefix)
         logging.debug('file written to {}.tsv'.format(outprefix))
         sys.exit()
 

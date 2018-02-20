@@ -110,7 +110,7 @@ class VariationClass:
                 self.CVSZ = star_dict[reviewstat]
                 self.CVCS = observation.find('./ClinicalSignificance/' \
                                              'Description').text
-                self.CVLU = observation.find('./ClinicalSignificance').get('DateLastEvaluated')
+                self.CVLE = observation.find('./ClinicalSignificance').get('DateLastEvaluated')
                 self.pheno_parse(observation)
 
             elif (observation.get('VariationID') == self.VID and
