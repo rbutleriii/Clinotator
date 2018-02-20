@@ -162,8 +162,8 @@ class VariationClass:
                     age = calculate_age(assertion.find('./ClinicalSignificance')
                                     .get('DateLastEvaluated'))
                 except:
-                    logging.warn('{} has no assertion date!'.format(self.VID))
-                    break
+                    logging.warn('{} has a missing assertion date!'.format(self.VID))
+                    continue
                     
                 age_list.append(age)
                 raw_score.append(score * sig_value * self.weighted_age(age))

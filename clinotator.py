@@ -69,24 +69,24 @@ def getargs():
 def input_selection(file_type, file, query_results):
     try:
         with open(file) as f:
-            id_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
 
             if file_type == 'vid':
+                id_list = [line.rstrip('\n') for line in f]
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
         
             elif file_type == 'rsid':
+                id_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
         
             elif file_type == 'vcf':
-                print('vcf parsing is not yet implemented, coming soon...')
-                sys.exit()
                 # implement vcf object? or generate list
-        return
-
+                vcf_list, vcf_tbl = vcf.file_prep(f, outprefix)
+                getncbi.get_ncbi_xml(file_type, vcf_list, query_results)
+                return vcf_tbl
+                
     except IOError as e:
-        errno, strerror = e.args
-        logging.fatal(e)
-        print('Unable to open file, Error {}: {}'.format(errno,strerror))
+        logging.fatal(error_handling())
+        print('Unable to open file, {}'.format(error_handling()))
     
     except:
         logging.fatal(error_handling())
@@ -125,12 +125,12 @@ def output_files(file_type, variant_objects, outprefix):
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
         for variant in variant_objects])
     result_tbl = result_tbl[columnz].sort_values('VID')
-    vcf_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='-')
-    vcf_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
+    out_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='-')
+    out_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
                       index=False)
 
     if file_type == 'vcf':
-        vcf.output_vcf()
+        vcf.output_vcf(out_tbl, vcf_tbl)
     return
     
 def main():
@@ -143,6 +143,9 @@ def main():
     for file in args.input:
         query_results = []
         variant_objects = []
+        base = os.path.basename(file)
+        outprefix = args.outprefix + '.' + os.path.splitext(base)[0]
+
         input_selection(args.type, file, query_results)
         logging.debug('the total # of query_results: {}'
                       .format(len(query_results)))
@@ -151,8 +154,6 @@ def main():
         logging.debug('the total # of variant_objects: {}'
                       .format(len(variant_objects)))
         
-        base = os.path.basename(file)
-        outprefix = args.outprefix + '.' + os.path.splitext(base)[0]
         output_files(args.type, variant_objects, outprefix)
         logging.debug('file written to {}.tsv'.format(outprefix))
         sys.exit()
