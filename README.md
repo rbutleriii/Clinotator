@@ -3,12 +3,12 @@
 
 ### Clinical interpretation of ambiguous ClinVar annotations
 
-This project takes variants as input and queries NCBI eutilities to generate scoring metrics. The overall goal is to generate annotations of use for given batches of variants to inform clinical interpretation. The metrics include:
+This project takes variants as input and queries NCBI eutilities to generate ClinVar Variation Report[1] scoring metrics. The overall goal is to generate annotations of use for given batches of variants to inform clinical interpretation. The metrics include:
 
-*	Clinotator Score -  In progress...
-*	Average Clinical Assertion Age -  In progress...
-*	Clinotator Weighted Significance -  In progress...
-*	Reclassification Recommendation -  In progress...
+*	Clinotator Raw Score -  A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. 
+*	Average Clinical Assertion Age -  The average age of clinical assertions made about a variant.
+*	Clinotator Weighted Significance -  A predicted clinical significance based on the Clinotator Raw Score.
+*	Reclassification Recommendation -  A probabalistic test of the power of the Clinotator Weighted Significance. 
 
 These and other stats are returned on a per variant basis, in a table, and additionally as vcf annotations if a vcf file is provided. See below for more information. 
 
@@ -154,3 +154,4 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ## References
 
+[1]: https://www.ncbi.nlm.nih.gov/clinvar/docs/variation_report/
