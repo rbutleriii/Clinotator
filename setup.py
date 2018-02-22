@@ -16,6 +16,6 @@ setup(
     author_email='rbutler@northshore.org',
     url='https://github.com/rbutleriii/clinotator',
     license=license,
-    packages=find_packages(exclude=())
+    packages=find_packages(pandas, biopython, exclude=())
 )
 

@@ -13,9 +13,9 @@ See main, eventually tests will be added for this module
 import pprint
 import logging
 import datetime
-import numpy
+import warnings
+import numpy as np
 import xml.etree.ElementTree as ET
-
 
 # work through batch queries from ncbi and build list of variant objects
 def query_parsing(variant_objects, query_results):
@@ -58,14 +58,17 @@ class VariationClass:
         vcf_match = []
         
         for index, alleles in enumerate(variationreport.findall('./Allele')):
+            
             try:
-                RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]').get('ID'))
+                RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]')
+                          .get('ID'))
             except:
                 RS.append('')
             
             try:
-                Alt.append(alleles.find('./SequenceLocation[@Assembly="GRCh38"]')
-                       .get('alternateAllele'))
+                Alt.append(alleles
+                           .find('./SequenceLocation[@Assembly="GRCh38"]')
+                           .get('alternateAllele'))
             except:
                 Alt.append('')
                 
@@ -110,7 +113,7 @@ class VariationClass:
                 self.CVSZ = star_dict[reviewstat]
                 self.CVCS = observation.find('./ClinicalSignificance/' \
                                              'Description').text
-                self.CVLU = observation.find('./ClinicalSignificance').get('DateLastEvaluated')
+                self.CVLE = observation.find('./ClinicalSignificance').get('DateLastEvaluated')
                 self.pheno_parse(observation)
 
             elif (observation.get('VariationID') == self.VID and
@@ -159,18 +162,30 @@ class VariationClass:
                 
             if score > 0 and sig_value != 0:
                 try:
-                    age = calculate_age(assertion.find('./ClinicalSignificance')
-                                    .get('DateLastEvaluated'))
+                    age = calculate_age(assertion
+                                        .find('./ClinicalSignificance')
+                                        .get('DateLastEvaluated'))
                 except:
-                    logging.warn('{} has no assertion date!'.format(self.VID))
-                    break
+                    logging.warn('{} has a missing assertion date!'
+                                 .format(self.VID))
+                    continue
                     
                 age_list.append(age)
                 raw_score.append(score * sig_value * self.weighted_age(age))
 
         self.CTRS = sum(raw_score)
         self.CVNA = len(age_list)
-        self.CTAA = numpy.mean(age_list)
+
+        #numpy RuntimeWarning for empty age_list, suppress warning and log 
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', category=RuntimeWarning)
+            try:
+                self.CTAA = np.nanmean(age_list)
+            except:
+                self.CTAA = None
+                logging.warn('{} does not have valid clinical assertions!'
+                              .format(self.VID))
+            
         logging.debug('age list size: {}, raw_score size: {}'
                       .format(len(age_list), len(raw_score)))
     
@@ -191,11 +206,12 @@ class VariationClass:
         if self.CTWS in self.CVCS:
             self.CTRR = 'Consistent Classification'
         else:
-            self.CTRR = 'Inconsistent result, under construction'
+            self.CTRR = 'Inconsistent result-under construction'
             
-
+# test
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    logging.debug('this is a module test')
     tree = ET.parse('../test/sample.xml')
     clinvarresult = tree.getroot()
     for var_index, variationreport in enumerate(clinvarresult):

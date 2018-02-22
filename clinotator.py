@@ -32,7 +32,7 @@ import bin.vcf as vcf
 import bin.variation as variation
 
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # error logging function plus config
 def error_handling():
@@ -41,52 +41,55 @@ def error_handling():
 
 # argparse function
 def getargs():
-    parser = argparse.ArgumentParser(prog='clinotator',
+    parser = argparse.ArgumentParser(prog='clinotator.py',
                                      formatter_class=
                                      argparse.RawTextHelpFormatter,
                                      description='Clinical interpretation ' \
                                      'of ambiguous ClinVar annotations')
+    parser.add_argument('--log', action='store_true', help='create logfile')
+    parser.add_argument('-o', metavar='prefix', dest='outprefix',
+                        default='clinotator',
+                        help='choose an alternate prefix for outfiles')
     parser.add_argument("--version", action='version',
                         version='\n'.join(['Clinotator v'
                                           + __version__, __doc__]))
-    parser.add_argument('-o', dest='outprefix', default='clinotator',
-                        nargs='?',
-                        help='Choose an alternate prefix for outfiles')
     parser.add_argument("input", metavar=('file'), nargs='+',
                         help="input file(s) (returns outfile for each)")
     requiredNamed = parser.add_argument_group('required arguments')
+    requiredNamed.add_argument('-e', dest='email', required=True,
+                               help='NCBI requires an email for querying '\
+                                    'their databases')
     requiredNamed.add_argument('-t', dest='type', required=True,
                                choices=['vid', 'rsid', 'vcf'],
                                help='vid - ClinVar Variation ID list\n' \
                                     'rsid - dbSNP rsID list\n' \
                                     'vcf - vcf file (output vcf generated)')
-    requiredNamed.add_argument('-e', dest='email', required=True,
-                               help='NCBI requires an email for querying '\
-                                    'their databases')
     return parser.parse_args()
 
-# how to handle file types 
-def input_selection(file_type, file, query_results):
+# how to handle file types, returns vcf_tbl or False for output 
+def input_selection(file_type, file, outprefix, query_results):
     try:
         with open(file) as f:
-            id_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
 
             if file_type == 'vid':
+                id_list = [line.rstrip('\n') for line in f]
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
+                return False
         
             elif file_type == 'rsid':
+                id_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
-        
+                return False
+            
             elif file_type == 'vcf':
-                print('vcf parsing is not yet implemented, coming soon...')
-                sys.exit()
-                # implement vcf object? or generate list
-        return
-
+                vcf_list, vcf_tbl = vcf.vcf_prep(f, outprefix)
+                id_list = [item.lstrip('rs') for item in vcf_list]
+                getncbi.get_ncbi_xml('rsid', id_list, query_results)
+                return vcf_tbl
+                
     except IOError as e:
-        errno, strerror = e.args
-        logging.fatal(e)
-        print('Unable to open file, Error {}: {}'.format(errno,strerror))
+        logging.fatal(error_handling())
+        print('Unable to open file, {}'.format(error_handling()))
     
     except:
         logging.fatal(error_handling())
@@ -119,23 +122,38 @@ def explode(df, lst_cols, fill_value=''):
           .loc[:, df.columns]
 
 # outfile generation with vcf option
-def output_files(file_type, variant_objects, outprefix):
+def output_files(vcf_tbl, variant_objects, outprefix):
     columnz = ['VID', 'CVVT', 'RSID', 'CVMA', 'vcfmatch', 'CVCS', 'CVSZ',
-               'CVNA', 'CVDS', 'CVLU', 'CTRS', 'CTAA', 'CTWS', 'CTRR']
+               'CVNA', 'CVDS', 'CVLE', 'CTRS', 'CTAA', 'CTWS', 'CTRR']
+
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
         for variant in variant_objects])
-    result_tbl = result_tbl[columnz].sort_values('VID')
-    vcf_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='-')
-    vcf_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
-                      index=False)
+    result_tbl = result_tbl[columnz]
+    # result_tbl = result_tbl.sort_values(by='VID', axis=1)
+    logging.debug('result_tbl shape -> {}'.format(result_tbl.shape))
 
-    if file_type == 'vcf':
-        vcf.output_vcf()
+    out_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='.')
+    out_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
+                   index=False)
+    logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
+
+    if isinstance(vcf_tbl, pd.DataFrame):
+        vcf_tbl['INFO'] = vcf_tbl.apply(lambda x: vcf.cat_info_column(x['INFO'],
+                                                            x['ID'],
+                                                            x['ALT'],
+                                                            out_tbl), axis=1)
+        vcf_tbl.to_csv('{}.anno.vcf'.format(outprefix), sep='\t', mode='a',
+                       index=False, na_rep='.')
     return
     
 def main():
-    logging.basicConfig(level=logging.DEBUG, filename="logfile.log")
     args = getargs()
+    
+    if args.log:
+        logging.basicConfig(level=logging.DEBUG, filename="clinotator.log")
+    else:
+        logging.basicConfig(level=logging.WARN)
+
     Entrez.email = args.email
     logging.debug('CLI inputs are {} {} {} {}'
                   .format(args.type, args.email, args.input, args.outprefix))
@@ -143,7 +161,10 @@ def main():
     for file in args.input:
         query_results = []
         variant_objects = []
-        input_selection(args.type, file, query_results)
+        base = os.path.basename(file)
+        outprefix = args.outprefix + '.' + os.path.splitext(base)[0]
+
+        vcf_tbl = input_selection(args.type, file, outprefix, query_results)
         logging.debug('the total # of query_results: {}'
                       .format(len(query_results)))
         
@@ -151,9 +172,7 @@ def main():
         logging.debug('the total # of variant_objects: {}'
                       .format(len(variant_objects)))
         
-        base = os.path.basename(file)
-        outprefix = args.outprefix + '.' + os.path.splitext(base)[0]
-        output_files(args.type, variant_objects, outprefix)
+        output_files(vcf_tbl, variant_objects, outprefix)
         logging.debug('file written to {}.tsv'.format(outprefix))
         sys.exit()
 

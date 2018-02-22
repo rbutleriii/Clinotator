@@ -1,0 +1,9 @@
+VID	CVVT	RSID	CVMA	vcfmatch	CVCS	CVSZ	CVNA	CVDS	CVLE	CTRS	CTAA	CTWS	CTRR
+262232	Simple	34376836	A	.	Benign	2	1	Brown-Vialetto-Van Laere syndrome 1;not specified	2017-06-07	-5.0	0.0	Likely benign	Inconsistent result-under construction
+211895	Simple	766877230	T	.	Uncertain significance	2	2	not specified	2016-11-02	-1.0	1.5	Uncertain significance	Consistent Classification
+55794	Simple	180177040	G	.	Likely pathogenic	0	0	Malignant melanoma of skin;Multiple myeloma;Adenocarcinoma of lung;Colorectal Neoplasms;Papillary renal cell carcinoma, sporadic;Ovarian Serous Cystadenocarcinoma	2016-05-31	0.0	.	Uncertain significance	Inconsistent result-under construction
+50317	Simple	118161496	C	.	Conflicting interpretations of pathogenicity	1	4	not provided;Inborn genetic diseases	2017-08-14	7.5	1.75	Likely pathogenic	Inconsistent result-under construction
+13979	Simple	180177040	C	.	Pathogenic	3	4	Cardiofaciocutaneous syndrome 1;not provided;Rasopathy;Cardio-facio-cutaneous syndrome	2017-04-03	19.5	1.25	Pathogenic	Consistent Classification
+7	Haplotype	200401432	A	['200401432|A', '118161496|C']	Pathogenic	1	1	Mitochondrial complex I deficiency	2014-04-09	4.5	3.0	Likely pathogenic	Inconsistent result-under construction
+7	Haplotype	118161496	C	['200401432|A', '118161496|C']	Pathogenic	1	1	Mitochondrial complex I deficiency	2014-04-09	4.5	3.0	Likely pathogenic	Inconsistent result-under construction
+
