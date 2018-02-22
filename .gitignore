@@ -1,6 +1,6 @@
-*.py[cod]
-__pycache__/
-main.py
+clinotator/*.py[cod]
+clinotator/__pycache__/
 Pipfile
 Pipfile.lock
-
+setup.py
+*~
