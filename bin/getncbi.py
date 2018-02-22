@@ -80,7 +80,8 @@ def batch_ncbi(query_type, query_results, id_list, **kwargs):
 
             try:
                 fetch_handle = getattr(Entrez,
-                                       query_type)(**dict(retstart=start, **kwargs))
+                                       query_type)(**dict(retstart=start,
+                                                          **kwargs))
 
             except ValueError as oops:
                 logging.warning('Likely total = batch size')

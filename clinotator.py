@@ -49,9 +49,10 @@ def getargs():
     parser.add_argument("--version", action='version',
                         version='\n'.join(['Clinotator v'
                                           + __version__, __doc__]))
-    parser.add_argument('-o', dest='outprefix', default='clinotator',
-                        nargs='?',
+    parser.add_argument('-o', metavar='prefix', dest='outprefix',
+                        default='clinotator', nargs=1,
                         help='Choose an alternate prefix for outfiles')
+    parser.add_argument('--log', action='store_true', help='Create logfile')
     parser.add_argument("input", metavar=('file'), nargs='+',
                         help="input file(s) (returns outfile for each)")
     requiredNamed = parser.add_argument_group('required arguments')
@@ -66,7 +67,7 @@ def getargs():
     return parser.parse_args()
 
 # how to handle file types, returns vcf_tbl or False for output 
-def input_selection(file_type, file, query_results):
+def input_selection(file_type, file, outprefix, query_results):
     try:
         with open(file) as f:
 
@@ -83,7 +84,7 @@ def input_selection(file_type, file, query_results):
             elif file_type == 'vcf':
                 vcf_list, vcf_tbl = vcf.vcf_prep(f, outprefix)
                 id_list = [item.lstrip('rs') for item in vcf_list]
-                getncbi.get_ncbi_xml(file_type, id_list, query_results)
+                getncbi.get_ncbi_xml('rsid', id_list, query_results)
                 return vcf_tbl
                 
     except IOError as e:
@@ -124,20 +125,35 @@ def explode(df, lst_cols, fill_value=''):
 def output_files(vcf_tbl, variant_objects, outprefix):
     columnz = ['VID', 'CVVT', 'RSID', 'CVMA', 'vcfmatch', 'CVCS', 'CVSZ',
                'CVNA', 'CVDS', 'CVLE', 'CTRS', 'CTAA', 'CTWS', 'CTRR']
+
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
         for variant in variant_objects])
-    result_tbl = result_tbl[columnz].sort_values('VID')
-    out_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='-')
-    out_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
-                      index=False)
+    result_tbl = result_tbl[columnz]
+    # result_tbl = result_tbl.sort_values(by='VID', axis=1)
+    logging.debug('result_tbl shape -> {}'.format(result_tbl.shape))
 
-    if vcf_tbl:
-        vcf.output_vcf(out_tbl, vcf_tbl)
+    out_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='.')
+    out_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
+                   index=False)
+    logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
+
+    if len(vcf_tbl.index) > 0:
+        vcf_tbl['INFO'] = vcf_tbl.apply(lambda x: vcf.cat_info_column(x['INFO'],
+                                                            x['ID'],
+                                                            x['ALT'],
+                                                            out_tbl), axis=1)
+        vcf_tbl.to_csv('{}.anno.vcf'.format(outprefix), sep='\t', mode='a',
+                       index=False, na_rep='.')
     return
     
 def main():
-    logging.basicConfig(level=logging.DEBUG, filename="logfile.log")
     args = getargs()
+    
+    if args.log:
+        logging.basicConfig(level=logging.DEBUG, filename="logfile.log")
+    else:
+        logging.basicConfig(level=logging.WARN)
+
     Entrez.email = args.email
     logging.debug('CLI inputs are {} {} {} {}'
                   .format(args.type, args.email, args.input, args.outprefix))
@@ -148,7 +164,7 @@ def main():
         base = os.path.basename(file)
         outprefix = args.outprefix + '.' + os.path.splitext(base)[0]
 
-        vcf_tbl = input_selection(args.type, file, query_results)
+        vcf_tbl = input_selection(args.type, file, outprefix, query_results)
         logging.debug('the total # of query_results: {}'
                       .format(len(query_results)))
         

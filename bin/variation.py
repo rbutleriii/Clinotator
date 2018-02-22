@@ -58,14 +58,17 @@ class VariationClass:
         vcf_match = []
         
         for index, alleles in enumerate(variationreport.findall('./Allele')):
+            
             try:
-                RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]').get('ID'))
+                RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]')
+                          .get('ID'))
             except:
                 RS.append('')
             
             try:
-                Alt.append(alleles.find('./SequenceLocation[@Assembly="GRCh38"]')
-                       .get('alternateAllele'))
+                Alt.append(alleles
+                           .find('./SequenceLocation[@Assembly="GRCh38"]')
+                           .get('alternateAllele'))
             except:
                 Alt.append('')
                 
@@ -159,10 +162,12 @@ class VariationClass:
                 
             if score > 0 and sig_value != 0:
                 try:
-                    age = calculate_age(assertion.find('./ClinicalSignificance')
-                                    .get('DateLastEvaluated'))
+                    age = calculate_age(assertion
+                                        .find('./ClinicalSignificance')
+                                        .get('DateLastEvaluated'))
                 except:
-                    logging.warn('{} has a missing assertion date!'.format(self.VID))
+                    logging.warn('{} has a missing assertion date!'
+                                 .format(self.VID))
                     continue
                     
                 age_list.append(age)
@@ -191,9 +196,9 @@ class VariationClass:
         if self.CTWS in self.CVCS:
             self.CTRR = 'Consistent Classification'
         else:
-            self.CTRR = 'Inconsistent result, under construction'
+            self.CTRR = 'Inconsistent result-under construction'
             
-
+# test
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     tree = ET.parse('../test/sample.xml')

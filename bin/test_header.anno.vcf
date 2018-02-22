@@ -11,17 +11,17 @@
 ##INFO=<ID=DB,Number=0,Type=Flag,Description="dbSNP membership, build 129">
 ##INFO=<ID=H2,Number=0,Type=Flag,Description="HapMap2 membership">
 ##INFO=<ID=VID,Number=1,Type=Integer,Description="ClinVar variation ID">
-##INFO=<ID=CVVT,Number=1,Type=String,Description="ClinVar variant type">
-##INFO=<ID=CVMA,Number=1,Type=String,Description="ClinVar minor allele">
-##INFO=<ID=CVCS,Number=1,Type=String,Description="ClinVar clinical significance">
-##INFO=<ID=CVSZ,Number=1,Type=Integer,Description="ClinVar stars">
-##INFO=<ID=CVNA,Number=1,Type=Integer,Description="ClinVar number of clinical assertions">
-##INFO=<ID=CVDS,Number=1,Type=String,Description="ClinVar conditions">
-##INFO=<ID=CVLE,Number=1,Type=String,Description="ClinVar last evaluated">
-##INFO=<ID=CTRS,Number=1,Type=Float,Description="Clinotator raw score">
-##INFO=<ID=CTAA,Number=1,Type=Float,Description="Clinotator average clinical assertion age">
-##INFO=<ID=CTWS,Number=1,Type=String,Description="Clinotator weighted significance">
-##INFO=<ID=CTRR,Number=1,Type=String,Description="Clinotator reclassification recommendation">
+##INFO=<ID=CVVT,Number=A,Type=String,Description="ClinVar variant type">
+##INFO=<ID=CVMA,Number=A,Type=String,Description="ClinVar minor allele">
+##INFO=<ID=CVCS,Number=A,Type=String,Description="ClinVar clinical significance">
+##INFO=<ID=CVSZ,Number=A,Type=Integer,Description="ClinVar stars">
+##INFO=<ID=CVNA,Number=A,Type=Integer,Description="ClinVar number of clinical assertions">
+##INFO=<ID=CVDS,Number=A,Type=String,Description="ClinVar conditions">
+##INFO=<ID=CVLE,Number=A,Type=String,Description="ClinVar last evaluated">
+##INFO=<ID=CTRS,Number=A,Type=Float,Description="Clinotator raw score">
+##INFO=<ID=CTAA,Number=A,Type=Float,Description="Clinotator average clinical assertion age">
+##INFO=<ID=CTWS,Number=A,Type=String,Description="Clinotator weighted significance">
+##INFO=<ID=CTRR,Number=A,Type=String,Description="Clinotator reclassification recommendation">
 ##FILTER=<ID=q10,Description="Quality below 10">
 ##FILTER=<ID=s50,Description="Less than 50% of samples have data">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
