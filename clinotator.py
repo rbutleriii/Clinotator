@@ -32,7 +32,7 @@ import bin.vcf as vcf
 import bin.variation as variation
 
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # error logging function plus config
 def error_handling():
@@ -41,29 +41,29 @@ def error_handling():
 
 # argparse function
 def getargs():
-    parser = argparse.ArgumentParser(prog='clinotator',
+    parser = argparse.ArgumentParser(prog='clinotator.py',
                                      formatter_class=
                                      argparse.RawTextHelpFormatter,
                                      description='Clinical interpretation ' \
                                      'of ambiguous ClinVar annotations')
+    parser.add_argument('--log', action='store_true', help='create logfile')
+    parser.add_argument('-o', metavar='prefix', dest='outprefix',
+                        default='clinotator',
+                        help='choose an alternate prefix for outfiles')
     parser.add_argument("--version", action='version',
                         version='\n'.join(['Clinotator v'
                                           + __version__, __doc__]))
-    parser.add_argument('-o', metavar='prefix', dest='outprefix',
-                        default='clinotator', nargs=1,
-                        help='Choose an alternate prefix for outfiles')
-    parser.add_argument('--log', action='store_true', help='Create logfile')
     parser.add_argument("input", metavar=('file'), nargs='+',
                         help="input file(s) (returns outfile for each)")
     requiredNamed = parser.add_argument_group('required arguments')
+    requiredNamed.add_argument('-e', dest='email', required=True,
+                               help='NCBI requires an email for querying '\
+                                    'their databases')
     requiredNamed.add_argument('-t', dest='type', required=True,
                                choices=['vid', 'rsid', 'vcf'],
                                help='vid - ClinVar Variation ID list\n' \
                                     'rsid - dbSNP rsID list\n' \
                                     'vcf - vcf file (output vcf generated)')
-    requiredNamed.add_argument('-e', dest='email', required=True,
-                               help='NCBI requires an email for querying '\
-                                    'their databases')
     return parser.parse_args()
 
 # how to handle file types, returns vcf_tbl or False for output 
@@ -137,7 +137,7 @@ def output_files(vcf_tbl, variant_objects, outprefix):
                    index=False)
     logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
 
-    if len(vcf_tbl.index) > 0:
+    if isinstance(vcf_tbl, pd.DataFrame):
         vcf_tbl['INFO'] = vcf_tbl.apply(lambda x: vcf.cat_info_column(x['INFO'],
                                                             x['ID'],
                                                             x['ALT'],
@@ -150,7 +150,7 @@ def main():
     args = getargs()
     
     if args.log:
-        logging.basicConfig(level=logging.DEBUG, filename="logfile.log")
+        logging.basicConfig(level=logging.DEBUG, filename="clinotator.log")
     else:
         logging.basicConfig(level=logging.WARN)
 

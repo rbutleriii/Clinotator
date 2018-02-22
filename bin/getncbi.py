@@ -20,7 +20,7 @@ except ImportError:
 Entrez.tool = 'Clinotator' # preferred by NCBI
 batch_size = 4500
 
-# getting xml files for an id_list
+# getting xml variation files for query_results list, 
 def get_ncbi_xml(file_type, id_list, query_results):
     logging.debug('{} list -> {}'.format(file_type, id_list))
     staging_list = []
@@ -46,7 +46,7 @@ def get_ncbi_xml(file_type, id_list, query_results):
     logging.debug('batches run -> {}'.format(len(query_results)))
     return
 
-# epost or elink list to history for target db. 
+# epost or elink list to e-utilities history server for target db. 
 def post_ncbi(file_type, query_type, **kwargs):
     logging.debug('{} to ncbi using kwargs: {}'.format(query_type, kwargs))
     handle = getattr(Entrez, query_type)(**kwargs)
@@ -65,7 +65,7 @@ def post_ncbi(file_type, query_type, **kwargs):
                                                                  query_key))
     return webenv, query_key
     
-# Utilized for batching from ncbi. HTTPError and retry 
+# Utilized for batch efetching from ncbi. HTTPError and retry 
 def batch_ncbi(query_type, query_results, id_list, **kwargs):
     count = len(id_list)
 

@@ -80,7 +80,7 @@ def cat_info_column(info, rsid, alt, out_tbl):
     alt_list = alt.split(",")
     info_columns = ['VID', 'CVVT', 'CVMA', 'CVCS', 'CVSZ', 'CVNA', 'CVDS',
                     'CVLE', 'CTRS', 'CTAA', 'CTWS', 'CTRR']
-    logging.debug('rsid_match: {} alt_list: {}'.format(rsid_match, alt_list))
+    logging.debug('rsid: {} alt_list: {}'.format(rsid_match, alt_list))
     # logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
     info_tbl = out_tbl.loc[(out_tbl['RSID'].astype('str') == rsid_match)
                            & out_tbl['CVMA'].isin(alt_list)]
@@ -101,6 +101,7 @@ def cat_info_column(info, rsid, alt, out_tbl):
 # test
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    logging.debug('this is a module test')
     with open('../test/test.vcf', 'r') as file_object:
         vcf_list, vcf_tbl = vcf_prep(file_object, 'test_header')
         logging.debug('vcf_list -> {}'.format(vcf_list))

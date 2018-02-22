@@ -13,9 +13,9 @@ See main, eventually tests will be added for this module
 import pprint
 import logging
 import datetime
-import numpy
+import warnings
+import numpy as np
 import xml.etree.ElementTree as ET
-
 
 # work through batch queries from ncbi and build list of variant objects
 def query_parsing(variant_objects, query_results):
@@ -175,7 +175,17 @@ class VariationClass:
 
         self.CTRS = sum(raw_score)
         self.CVNA = len(age_list)
-        self.CTAA = numpy.mean(age_list)
+
+        #numpy RuntimeWarning for empty age_list, suppress warning and log 
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', category=RuntimeWarning)
+            try:
+                self.CTAA = np.nanmean(age_list)
+            except:
+                self.CTAA = None
+                logging.warn('{} does not have valid clinical assertions!'
+                              .format(self.VID))
+            
         logging.debug('age list size: {}, raw_score size: {}'
                       .format(len(age_list), len(raw_score)))
     
@@ -201,6 +211,7 @@ class VariationClass:
 # test
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    logging.debug('this is a module test')
     tree = ET.parse('../test/sample.xml')
     clinvarresult = tree.getroot()
     for var_index, variationreport in enumerate(clinvarresult):
