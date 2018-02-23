@@ -132,6 +132,15 @@ The assertion type is that largest weight, with values of: Benign(B) = -5, Likel
 	<dd>For a detailed decision tree, see Figure 2 in our publication.<sup>6</sup></dd>
 </dl>
 
+## Citation
+
+Citation
+
+'''
+BibTex format citation
+'''
+
+
 ## License
 
 Copyright (C) 2017  Robert R Butler III
