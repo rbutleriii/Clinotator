@@ -37,11 +37,11 @@ required arguments:
 
 ### Minimum Inputs
 
-Three required bits of information: (1) the type of input file, (2) the file itself and (3) your email address. The input comes as either a simple text ID list file, or a vcf. If a vcf(s) is selected, clinotator will generate an annotated output file. In all cases a tab-delimited table file will be produced. The email is required by NCBI/biopython as NCBI enforces a strict 3 queries per second limit. Before they ban your IP address they will attempt to contact you, but that should not be a problem as clinotator uses batch queries and the history server.
+Three required bits of information: (1) the type of input file, (2) the file itself and (3) your email address. The input comes as either a text ID list file, or a vcf. If a vcf(s) is selected, clinotator will generate an annotated output file. In all cases a tab-delimited table file will be produced. The email is required by NCBI/biopython as NCBI enforces a strict 3 queries per second limit. Before they ban your IP address they will attempt to contact you, but that should not be a problem as clinotator uses batch queries and the history server.
 
 ### Optional Arguments
 
-In progress...
+Additional arguments include a log file and specification of the output file prefix.
 
 ## Motivation
 
@@ -86,15 +86,15 @@ export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
 
 <dl>
 	<dt>ClinVar Clinical Significance (**CVCS**)</dt>
-	<dd>Clinical significance reported by ClinVar.</dd>
+	<dd>Clinical significance reported by ClinVar.[2] Ratings metrics are based on the five ACMG/AMP recommended classifications for Mendelian disorders: Benign, Likely benign, Uncertain significance, Likely pathogenic and Pathogenic. Other Clinical significance values are reported, but not factored into the Clinotator metrics.</dd>
 </dl>
 <dl>
 	<dt>ClinVar Stars (**CVSZ**)</dt>
-	<dd>Star rating given by clinvar. Ranges from zero to four.</dd>
+	<dd>Star rating given by clinvar. Ranges from zero to four.[3] </dd>
 </dl>
 <dl>
 	<dt>ClinVar Number of Clinical Assertions (**CVNA**)</dt>
-	<dd>The number of Clinvar Submissions possessing a clinical assertion (with criteria provided). Most assertions meet or exceed the guidelines put for by the American College of Medical Genetics and Genomics (ACMG).</dd>
+	<dd>The number of Clinvar Submissions possessing a clinical assertion (with criteria provided). This measure excludes submissions without assertion criteria, including "literature reviews", which are a type of evidence as opposed to an assertion. Additionally, submitter assertions without defined criteria are also omitted. Most assertions with criteria meet or exceed the guidelines put for by the American College of Medical Genetics and Genomics (ACMG) in 2013 and amended in 2015.[4][5]</dd>
 </dl>
 <dl>
 	<dt>ClinVar Conditions/Diseases (**CVDS**)</dt>
@@ -102,38 +102,31 @@ export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
 </dl>
 <dl>
 	<dt>ClinVar Last Evaluated (**CVLE**)</dt>
-	<dd>The date the clinical significance of the variation report was last evaluated.</dd>
+	<dd>The date the clinical significance of the variation report was last evaluated. Note this is not the date the variation report was last updated, but the date in the \<ClinicalAssertionList\> field of the ClinVar xml connected to the Review Status.</dd>
 </dl>
 <dl>
 	<dt>ClinVar Variant Type (**CVVT**)</dt>
-	<dd>The type of variation in ClinVar. Currently defined as either "Simple" or "Haplotype" if multiple AlleleIDs are involved.</dd>
+	<dd>The type of variation in ClinVar. Currently defined as either "Simple" with a single AlleleID or "Haplotype" if multiple AlleleIDs are involved.</dd>
 </dl>
 
 ### Clinotator Metrics
 
 <dl>
 	<dt>Clinotator Raw Score (**CTRS**)</dt>
-	<dd>In progress...</dd>
+	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25. the age of the assertion is penalized as new data is incorporated into newer assertions as well as previous data, creating a larger set of evidence over time. For years 0-2, there is no penalty, then there is a 10% reduction gradation in weight per year through year 7, at which point the penalty stays at a static 50% reduction thereafter. The assertion type is that largest weight, with values of: Benign(B) = -5, Likely benign(LB) = -3, Uncertain significance(US) = -0.5, Likely pathogenic(LP) = 4 and Pathogenic(P) = 5. For more information on the weighting decisions, see our publication.[6]</dd>
 </dl>
 <dl>
 	<dt>Average Clinical Assertion Age (**CTAA**)</dt>
-	<dd>In progress...</dd>
+	<dd>As described above, the clinical assertions with criteria provided are counted, and their average age is calculated.</dd>
 </dl>
 <dl>
 	<dt>Clinotator Weighted Significance (**CTWS**)</dt>
-	<dd>In progress...</dd>
+	<dd>This is a clinical significance based on the distribution of all variants in ClinVar with two or more stars. The ratings for B and P are those two standard deviations or more from the mean. LP and LB are those from one to two standard deviations from the mean.</dd>
 </dl>
 <dl>
 	<dt>Reclassification Recommendation (**CTRR**)</dt>
-	<dd>In progress...</dd>
+	<dd>This field is a recommendation and a diagnostic odds ratio from a ROC curve comparing the distribution of Clinotator Weighted Significance value and the Uncertain Significance distribution. Both distributions are drawn from two star or higher variants of the associated category. If the CTWS is also Uncertain Significance, then </dd>
 </dl>
-
-## Tests
-
-For the main package, the following tests check the installation:
-
-```
-```
 
 ## License
 
@@ -155,3 +148,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 ## References
 
 [1]: https://www.ncbi.nlm.nih.gov/clinvar/docs/variation_report/
+[2]: https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/
+[3]: https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/
+[4]: ACMG Guidelines 2013
+[5]: ACMG Guidelines 2015
+[6]: Our paper
+
