@@ -116,12 +116,12 @@ Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versi
 </dl>
 <dl>
 	<dt>Clinotator Reclassification Recommendation (**CTRR**)</dt>
-	<dd>This field ranks reclassification priority based on the difference between the CVCS and the CTWS. This field only includes the seven values of clinical significance associated with Mendelian diseases (B, B/LB, LB, US/CI, LP, LP/P, P). For the purposes of reclassification, "Conflicting interpretations of pathogenicity" is scored the same as Uncertain significance.  
+	<dd>This field ranks reclassification priority based on the difference between the CVCS and the CTWS. This field only includes the seven values of clinical significance associated with Mendelian diseases (B, B/LB, LB, US/CI, LP, LP/P, P). For the purposes of reclassification, "Conflicting interpretations of pathogenicity" is scored the same as Uncertain significance.</dd>
 *	0 - Reclassification unlikely, consistent identity or 
 *	1 - Low priority reclassification, change of low impact
 *	2 - Medium priority reclassification, minor change of clinical impact
-*	3 - High priority reclassification, significant change in clinical impact  
-For a detailed decision tree, see more information in our publication<sup>6</sup></dd>
+*	3 - High priority reclassification, significant change in clinical impact
+	<dd>For a detailed decision tree, see more information in our publication.<sup>6</sup></dd>
 </dl>
 
 ## License
