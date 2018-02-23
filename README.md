@@ -71,30 +71,21 @@ pandas==0.22.0
 
 Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versions if possible.
 
-### Proxy
-
-biopython uses urllib to query eutilities (I believe now https only), so if you are behind a proxy add the following to your ~/.bash_profile:
-
-```
-export HTTP_PROXY=http://username:password@proxy.mydomain.com:8080
-export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
-```
-
 ## Details on metrics
 
 ### ClinVar Metrics
 
 <dl>
 	<dt>ClinVar Clinical Significance (**CVCS**)</dt>
-	<dd>Clinical significance reported by ClinVar.[2] Ratings metrics are based on the five ACMG/AMP recommended classifications for Mendelian disorders: Benign, Likely benign, Uncertain significance, Likely pathogenic and Pathogenic. Other Clinical significance values are reported, but not factored into the Clinotator metrics.</dd>
+	<dd>Clinical significance reported by ClinVar.<sup>2</sup> Ratings metrics are based on the five ACMG/AMP recommended classifications for Mendelian disorders: Benign, Likely benign, Uncertain significance, Likely pathogenic and Pathogenic. Other Clinical significance values are reported, but not factored into the Clinotator metrics.</dd>
 </dl>
 <dl>
 	<dt>ClinVar Stars (**CVSZ**)</dt>
-	<dd>Star rating given by clinvar. Ranges from zero to four.[3] </dd>
+	<dd>Star rating given by clinvar. Ranges from zero to four.<sup>3</sup></dd>
 </dl>
 <dl>
 	<dt>ClinVar Number of Clinical Assertions (**CVNA**)</dt>
-	<dd>The number of Clinvar Submissions possessing a clinical assertion (with criteria provided). This measure excludes submissions without assertion criteria, including "literature reviews", which are a type of evidence as opposed to an assertion. Additionally, submitter assertions without defined criteria are also omitted. Most assertions with criteria meet or exceed the guidelines put for by the American College of Medical Genetics and Genomics (ACMG) in 2013 and amended in 2015.[4][5]</dd>
+	<dd>The number of Clinvar Submissions possessing a clinical assertion (with criteria provided). This measure excludes submissions without assertion criteria, including "literature reviews", which are a type of evidence as opposed to an assertion. Additionally, submitter assertions without defined criteria are also omitted. Most assertions with criteria meet or exceed the guidelines put for by the American College of Medical Genetics and Genomics (ACMG) in 2013 and amended in 2015.<sup>4</sup><sup>5</sup></dd>
 </dl>
 <dl>
 	<dt>ClinVar Conditions/Diseases (**CVDS**)</dt>
@@ -113,19 +104,24 @@ export HTTPS_PROXY=http://username:password@proxy.mydomain.com:8080
 
 <dl>
 	<dt>Clinotator Raw Score (**CTRS**)</dt>
-	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25. the age of the assertion is penalized as new data is incorporated into newer assertions as well as previous data, creating a larger set of evidence over time. For years 0-2, there is no penalty, then there is a 10% reduction gradation in weight per year through year 7, at which point the penalty stays at a static 50% reduction thereafter. The assertion type is that largest weight, with values of: Benign(B) = -5, Likely benign(LB) = -3, Uncertain significance(US) = -0.5, Likely pathogenic(LP) = 4 and Pathogenic(P) = 5. For more information on the weighting decisions, see our publication.[6]</dd>
+	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25. the age of the assertion is penalized as new data is incorporated into newer assertions as well as previous data, creating a larger set of evidence over time. For years 0-2, there is no penalty, then there is a 10% reduction gradation in weight per year through year 7, at which point the penalty stays at a static 50% reduction thereafter. The assertion type is that largest weight, with values of: Benign(B) = -5, Likely benign(LB) = -3, Uncertain significance(US) = -0.5, Likely pathogenic(LP) = 4 and Pathogenic(P) = 5. For more information on the weighting decisions, see our publication.<sup>6</sup></dd>
 </dl>
 <dl>
 	<dt>Average Clinical Assertion Age (**CTAA**)</dt>
 	<dd>As described above, the clinical assertions with criteria provided are counted, and their average age is calculated.</dd>
 </dl>
 <dl>
-	<dt>Clinotator Weighted Significance (**CTWS**)</dt>
-	<dd>This is a clinical significance based on the distribution of all variants in ClinVar with two or more stars. The ratings for B and P are those two standard deviations or more from the mean. LP and LB are those from one to two standard deviations from the mean.</dd>
+	<dt>Clinotator Predicted Significance (**CTWS**)</dt>
+	<dd>This is a *predicted* clinical significance based on the weighted distribution of all variants in ClinVar with two or more clinical assertions (as of a Clinotator version release date). The ratings are calculated as previously described, based on confidence intervals from BCa bootstrap resampling of the given classification. See publication for details.<sup>6</sup></dd>
 </dl>
 <dl>
-	<dt>Reclassification Recommendation (**CTRR**)</dt>
-	<dd>This field is a recommendation and a diagnostic odds ratio from a ROC curve comparing the distribution of Clinotator Weighted Significance value and the Uncertain Significance distribution. Both distributions are drawn from two star or higher variants of the associated category. If the CTWS is also Uncertain Significance, then </dd>
+	<dt>Clinotator Reclassification Recommendation (**CTRR**)</dt>
+	<dd>This field ranks reclassification priority based on the difference between the CVCS and the CTWS. This field only includes the seven values of clinical significance associated with Mendelian diseases (B, B/LB, LB, US/CI, LP, LP/P, P). For the purposes of reclassification, "Conflicting interpretations of pathogenicity" is scored the same as Uncertain significance.  
+*	0 - Reclassification unlikely, consistent identity or 
+*	1 - Low priority reclassification, change of low impact
+*	2 - Medium priority reclassification, minor change of clinical impact
+*	3 - High priority reclassification, significant change in clinical impact  
+For a detailed decision tree, see more information in our publication<sup>6</sup></dd>
 </dl>
 
 ## License
@@ -147,10 +143,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ## References
 
-[1]: https://www.ncbi.nlm.nih.gov/clinvar/docs/variation_report/
-[2]: https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/
-[3]: https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/
-[4]: ACMG Guidelines 2013
-[5]: ACMG Guidelines 2015
-[6]: Our paper
+<sup>1</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/variation_report/  
+<sup>2</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/  
+<sup>3</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/  
+<sup>4</sup>  ACMG Guidelines 2013  
+<sup>5</sup>  ACMG Guidelines 2015  
+<sup>6</sup>  Our paper  
 
