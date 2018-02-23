@@ -30,9 +30,10 @@ import Bio.Entrez as Entrez
 import getncbi
 import vcf
 import variation
+import global_vars as g
 
 
-__version__ = "0.2.0"
+__version__ = g.__version__
 
 # error logging function plus config
 def error_handling():

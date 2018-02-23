@@ -11,6 +11,7 @@ See main, eventually tests will be added for this module
 import logging
 import sys
 import Bio.Entrez as Entrez
+import global_vars as g
 try:
     from urllib.error import HTTPError  # for Python 3
 except ImportError:
@@ -18,7 +19,6 @@ except ImportError:
 
 
 Entrez.tool = 'Clinotator' # preferred by NCBI
-batch_size = 4500
 
 # getting xml variation files for query_results list, 
 def get_ncbi_xml(file_type, id_list, query_results):
@@ -40,7 +40,7 @@ def get_ncbi_xml(file_type, id_list, query_results):
                       '-> {}'.format(file_type))
 
     batch_ncbi('efetch', staging_list, id_list, db='clinvar',
-               rettype='variation', retmax=batch_size, webenv=webenv1,
+               rettype='variation', retmax=g.batch_size, webenv=webenv1,
                query_key=query_key1)
     [query_results.append(batch) for batch in staging_list] 
     logging.debug('batches run -> {}'.format(len(query_results)))
@@ -69,8 +69,8 @@ def post_ncbi(file_type, query_type, **kwargs):
 def batch_ncbi(query_type, query_results, id_list, **kwargs):
     count = len(id_list)
 
-    for start in range(0, count, batch_size):
-        end = min(count, start+batch_size)
+    for start in range(0, count, g.batch_size):
+        end = min(count, start + g.batch_size)
         logging.debug('{} run with {}'.format(query_type,
                                               dict(retstart=start, **kwargs)))
         print("Going to download record %i to %i" % (start+1, end))
