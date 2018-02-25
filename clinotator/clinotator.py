@@ -42,11 +42,11 @@ def error_handling():
 
 # argparse function
 def getargs():
-    parser = argparse.ArgumentParser(prog='clinotator.py',
-                                     formatter_class=
-                                     argparse.RawTextHelpFormatter,
-                                     description='Clinical interpretation ' \
-                                     'of ambiguous ClinVar annotations')
+    parser = argparse \
+            .ArgumentParser(prog='clinotator.py',
+                            formatter_class=argparse.RawTextHelpFormatter,
+                            description='Clinical interpretation of ambiguous'
+                                        ' ClinVar annotations')
     parser.add_argument('--log', action='store_true', help='create logfile')
     parser.add_argument('-o', metavar='prefix', dest='outprefix',
                         default='clinotator',
@@ -57,13 +57,13 @@ def getargs():
     parser.add_argument("input", metavar=('file'), nargs='+',
                         help="input file(s) (returns outfile for each)")
     requiredNamed = parser.add_argument_group('required arguments')
-    requiredNamed.add_argument('-e', dest='email', required=True,
-                               help='NCBI requires an email for querying '\
-                                    'their databases')
+    requiredNamed \
+            .add_argument('-e', dest='email', required=True,
+                          help='NCBI requires an email for database queries')
     requiredNamed.add_argument('-t', dest='type', required=True,
                                choices=['vid', 'rsid', 'vcf'],
-                               help='vid - ClinVar Variation ID list\n' \
-                                    'rsid - dbSNP rsID list\n' \
+                               help='vid - ClinVar Variation ID list\n'
+                                    'rsid - dbSNP rsID list\n'
                                     'vcf - vcf file (output vcf generated)')
     return parser.parse_args()
 
@@ -139,10 +139,9 @@ def output_files(vcf_tbl, variant_objects, outprefix):
     logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
 
     if isinstance(vcf_tbl, pd.DataFrame):
-        vcf_tbl['INFO'] = vcf_tbl.apply(lambda x: vcf.cat_info_column(x['INFO'],
-                                                            x['ID'],
-                                                            x['ALT'],
-                                                            out_tbl), axis=1)
+        vcf_tbl['INFO'] = vcf_tbl \
+            .apply(lambda x: vcf.cat_info_column(x['INFO'], x['ID'], x['ALT'],
+                                                 out_tbl), axis=1)
         vcf_tbl.to_csv('{}.anno.vcf'.format(outprefix), sep='\t', mode='a',
                        index=False, na_rep='.')
     return

@@ -13,6 +13,7 @@ import re
 import logging
 import sys
 import pandas as pd
+import global_vars as g
 
 
 # error logging function plus config
@@ -22,25 +23,13 @@ def error_handling():
 
 # generates header for outfile, also counts input header lines
 def parse_header(file_object, outprefix):
-    max_vcf_header_size = 200
-    new_headers = ['##INFO=<ID=VID,Number=1,Type=Integer,Description="ClinVar variation ID">\n',
-                   '##INFO=<ID=CVVT,Number=A,Type=String,Description="ClinVar variant type">\n',
-                   '##INFO=<ID=CVMA,Number=A,Type=String,Description="ClinVar minor allele">\n',
-                   '##INFO=<ID=CVCS,Number=A,Type=String,Description="ClinVar clinical significance">\n',
-                   '##INFO=<ID=CVSZ,Number=A,Type=Integer,Description="ClinVar stars">\n',
-                   '##INFO=<ID=CVNA,Number=A,Type=Integer,Description="ClinVar number of clinical assertions">\n',
-                   '##INFO=<ID=CVDS,Number=A,Type=String,Description="ClinVar conditions">\n',
-                   '##INFO=<ID=CVLE,Number=A,Type=String,Description="ClinVar last evaluated">\n',
-                   '##INFO=<ID=CTRS,Number=A,Type=Float,Description="Clinotator raw score">\n',
-                   '##INFO=<ID=CTAA,Number=A,Type=Float,Description="Clinotator average clinical assertion age">\n',
-                   '##INFO=<ID=CTWS,Number=A,Type=String,Description="Clinotator weighted significance">\n',
-                   '##INFO=<ID=CTRR,Number=A,Type=String,Description="Clinotator reclassification recommendation">\n']
+
     try:
         with open('{}.anno.vcf'.format(outprefix), 'w') as outfile:
             header = []
             info_list = []
             for index, line in enumerate(next(file_object)
-                                         for x in range(max_vcf_header_size)):
+                                         for x in range(g.max_vcf_header_size)):
                 m = re.match('##(\w+)=', line)
                 
                 if m and m.group(1) == 'INFO':
@@ -52,7 +41,7 @@ def parse_header(file_object, outprefix):
                     continue
             
             header_count = len(header)
-            header[max(info_list) + 1 : max(info_list) + 1] = new_headers
+            header[max(info_list) + 1 : max(info_list) + 1] = g.new_headers
             outfile.writelines(('{}'.format(item) for item in header))
             file_object.seek(0) # reset read cursor to beginning
             logging.debug('Initial header: {} INFO lines: {} Final header: {}'
@@ -83,11 +72,14 @@ def cat_info_column(info, rsid, alt, out_tbl):
     logging.debug('rsid: {} alt_list: {}'.format(rsid_match, alt_list))
     # logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
     info_tbl = out_tbl.loc[(out_tbl['RSID'].astype('str') == rsid_match)
-                           & out_tbl['CVMA'].isin(alt_list)]
+                           & out_tbl['CVMA'].isin(alt_list)].copy()
     
     if len(info_tbl.index) > 0:
+        info_tbl.replace({'CVCS': {',': '%2C', ';': '%3B'},
+                          'CVDS': {',': '%2C', ';': '%3B'}},
+                         regex=True, inplace=True)
         new_info = ['{}={}'.format(x, info_tbl[x]
-                    .to_csv(header=None, index=False)
+                    .to_csv(header=None, index=False, na_rep='.')
                     .strip('\n')) for x in info_columns]
         new_info = [string.replace('\n', ',') for string in new_info]
         logging.debug('{} had a match: {}'.format(rsid, new_info))
