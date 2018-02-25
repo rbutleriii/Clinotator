@@ -85,9 +85,11 @@ significance = {'Benign': -5,
                 'conflicting data from submitters': 0, 'other': 0,
                 'not provided': 0}
 
-# dict of weighted score cutoffs for ctws
-ctws_cutoffs = {'Benign': -15,
-                'Likely benign': -6,
-                'Uncertain significance': -1,
-                'Likely pathogenic': 8,
-                'Pathogenic': 15}
+# list of weighted score upper bounds for ctws bins
+ctws_cutoffs = [('Benign', -15),
+                ('Benign/Likely benign', -10),
+                ('Likely benign', -5),
+                ('Uncertain significance', 8),
+                ('Likely pathogenic', 12),
+                ('Pathogenic/Likely pathogenic', 15),
+                ('Pathogenic', 10000000)]

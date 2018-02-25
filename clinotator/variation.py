@@ -69,6 +69,35 @@ def key_test(test_dict, test_key):
     except KeyError:
         logging.warn('{} is not an expected key'.format(test_key))
 
+# evaluates reclassification recommendation for CTRR
+def reclassification_tree(ctws_index, cvcs_index):    
+    index_diff = abs(ctws_index - cvcs_index)
+    
+    if index_diff == 0:
+        return 0
+    elif index_diff == 1 and cvcs_index in (0,1,2,4,5,6) and ctws_index != 3:
+        return 1
+    elif index_diff == 1 and cvcs_index in (0,1,2,4,5,6) and ctws_index == 3:
+        return 2
+    elif index_diff == 1 and cvcs_index == 3:
+        return 2
+    elif (index_diff == 2 and cvcs_index in (0, 1, 2)
+            and ctws_index in (0, 1, 2)):
+        return 2
+    elif (index_diff == 2 and cvcs_index in (0, 1, 2)
+            and ctws_index not in (0, 1, 2)):
+        return 3
+    elif index_diff == 2 and cvcs_index == 3:
+        return 3
+    elif (index_diff == 2 and cvcs_index in (4, 5, 6)
+            and ctws_index in (4, 5, 6)):
+        return 2
+    elif (index_diff == 2 and cvcs_index in (4, 5, 6)
+            and ctws_index not in (4, 5, 6)):
+        return 3
+    elif index_diff > 2:
+        return 3
+                
 
 class VariationClass:
     
@@ -183,18 +212,36 @@ class VariationClass:
 
     # calculating the analytical stats: CTWS, CTRR.
     def analysis_stats(self):
-        sig_diff = {}
         
-        for sig, value in g.ctws_cutoffs.items():
-            sig_diff[sig] = abs(value - self.CTRS)
+        if self.CVNA < 2:
+            self.CTWS = None
+            self.CTRR = 0
+            return
         
-        self.CTWS = min(sig_diff, key=sig_diff.get)
+        ctws_index = np.digitize(self.CTRS,
+                                [x[1] for x in g.ctws_cutoffs[:6]]).tolist()
+        self.CTWS = g.ctws_cutoffs[ctws_index][0]
         
-        if self.CTWS in self.CVCS:
-            self.CTRR = 'Consistent Classification'
-        else:
-            self.CTRR = 'Inconsistent result-under construction'
-            
+        run_already = False
+        cvcs_index = None
+        for clinsig in self.CVCS.split(', '):
+            if clinsig in [x[0] for x in g.ctws_cutoffs] and not run_already:
+                run_already = True
+                cvcs_index = [x[0] for x in g.ctws_cutoffs].index(clinsig)
+            elif clinsig == 'Conflicting interpretations of pathogenicity':
+                run_already = True
+                cvcs_index = 3
+            elif clinsig in [x[0] for x in g.ctws_cutoffs] and run_already:
+                logging.warn('multiple CVCS statements for {}, only using fir'
+                             'st one!'.format(self.VID))
+        
+        if not cvcs_index:
+            self.CTWS = None
+            self.CTRR = 0
+            return
+        
+        self.CTRR = reclassification_tree(ctws_index, cvcs_index)
+        
 # test
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
