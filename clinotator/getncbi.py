@@ -18,12 +18,13 @@ except ImportError:
     from urllib2 import HTTPError  # for Python 2
 
 
-Entrez.tool = 'Clinotator' # preferred by NCBI
+Entrez.tool = g.etool
 
 # getting xml variation files for query_results list, 
 def get_ncbi_xml(file_type, id_list, query_results):
     logging.debug('{} list -> {}'.format(file_type, id_list))
     staging_list = []
+    id_list = list(filter(None, id_list)) # costs ~ 6 sec per 50k list
 
     if file_type == 'rsid':
         webenv2, query_key2 = post_ncbi(file_type, 'epost', db='snp',
@@ -36,8 +37,8 @@ def get_ncbi_xml(file_type, id_list, query_results):
         webenv1, query_key1 = post_ncbi(file_type, 'epost', db='clinvar',
                                         id=",".join(id_list))
     else:
-        logging.fatal('Error: Incorrect file_type argument in get_rsid_xml ' \
-                      '-> {}'.format(file_type))
+        logging.fatal('Error: Incorrect file_type argument in get_rsid_xml ->'
+                      ' {}'.format(file_type))
 
     batch_ncbi('efetch', staging_list, id_list, db='clinvar',
                rettype='variation', retmax=g.batch_size, webenv=webenv1,
@@ -61,27 +62,26 @@ def post_ncbi(file_type, query_type, **kwargs):
         webenv = query['WebEnv']
         query_key = query['QueryKey']
 
-    logging.debug('returned webenv: {} and query key: {}'.format(webenv,
-                                                                 query_key))
+    logging.debug('returned webenv: {} and query key: {}'
+                  .format(webenv, query_key))
     return webenv, query_key
     
-# Utilized for batch efetching from ncbi. HTTPError and retry 
+# Utilized for batch efetch/esummary from ncbi. HTTPError and retry 
 def batch_ncbi(query_type, query_results, id_list, **kwargs):
     count = len(id_list)
 
     for start in range(0, count, g.batch_size):
         end = min(count, start + g.batch_size)
-        logging.debug('{} run with {}'.format(query_type,
-                                              dict(retstart=start, **kwargs)))
+        logging.debug('{} run with {}'
+                      .format(query_type, dict(retstart=start, **kwargs)))
         print("Going to download record %i to %i" % (start+1, end))
         attempt = 0
         while attempt < 3:
             attempt += 1
 
             try:
-                fetch_handle = getattr(Entrez,
-                                       query_type)(**dict(retstart=start,
-                                                          **kwargs))
+                fetch_handle = getattr(Entrez, query_type) \
+                        (**dict(retstart=start, **kwargs))
 
             except ValueError as oops:
                 logging.warning('Likely total = batch size')
