@@ -121,17 +121,18 @@ class VariationClass:
                 RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]')
                           .get('ID'))
             except:
-                RS.append('')
+                RS.append('.')
             
             try:
                 Alt.append(alleles
                            .find('./SequenceLocation[@Assembly="GRCh38"]')
                            .get('alternateAllele'))
             except:
-                Alt.append('')
+                Alt.append('.')
                 
             vcf_match.append('{}|{}'.format(RS[index], Alt[index]))
             
+        logging.debug('RS list -> {}\nAlt list -> {}'.format(RS, Alt))
         self.RSID = RS
         self.CVMA = Alt
         
