@@ -42,9 +42,9 @@ def age_weight(age):
 
     if age < 2:
         return 1
-    elif 2 <= age <= 7:
-        return ((12 - age) / 10)
-    elif age > 7:
+    elif 2 <= age < 7:
+        return ((11 - age) / 10)
+    elif age >= 7:
         return 0.5
 
 # when using a list of ages, catch empty list and return average age

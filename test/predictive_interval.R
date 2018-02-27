@@ -10,6 +10,12 @@ US_dist <- sort(US_tbl$CTRS)
 US_cth <- floor((0.01/2) * (length(US_dist) + 1))
 US_PI <- c(US_dist[US_cth], US_dist[length(US_dist) - US_cth + 1])
 
+# US* distribution
+USalt_tbl <- filter(big_tbl, grepl('Uncertain significance', CVCS) & CVNA >= 2, CVSZ == 2)
+USalt_dist <- sort(USalt_tbl$CTRS)
+USalt_cth <- floor((0.01/2) * (length(USalt_dist) + 1))
+USalt_PI <- c(USalt_dist[USalt_cth], USalt_dist[length(USalt_dist) - USalt_cth + 1])
+
 # LP distribution
 LP_tbl <- filter(big_tbl, grepl('^Likely pathogenic', CVCS) & CVNA >= 2)
 LP_dist <- sort(LP_tbl$CTRS)
@@ -37,6 +43,13 @@ B_PI <- c(B_dist[B_cth], B_dist[length(B_dist) - B_cth + 1])
 cat('B:', median(B_dist), B_PI, '\n')
 cat('LB:', median(LB_dist), LB_PI, '\n')
 cat('US:', median(US_dist), US_PI, '\n')
+cat('USalt:', median(USalt_dist), USalt_PI, '\n')
 cat('LP:', median(LP_dist), LP_PI, '\n')
 cat('P:', median(P_dist), P_PI, '\n')
 
+# B: -10 -66.1 -6 
+# LB: -6 -25.8 -3.84 
+# US: -0.6 -5.531 -0.36 
+# USalt: -0.6 -2.37 -0.42 
+# LP: 3.2 1.01 14.17 
+# P: 5.8 3.19 33.611 

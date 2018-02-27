@@ -77,19 +77,19 @@ cutoff = {'practice guideline': 1.25,
 # dict of assertion significances for scoring
 significance = {'Benign': -5,
                 'Likely benign': -3,
-                'Uncertain significance': -0.5,
-                'Likely pathogenic': 3,
-                'Pathogenic': 5,
+                'Uncertain significance': -0.3,
+                'Likely pathogenic': 1.6,
+                'Pathogenic': 2.9,
                 'drug response': 0, 'association': 0, 'risk factor': 0,
                 'protective': 0, 'Affects': 0,
                 'conflicting data from submitters': 0, 'other': 0,
                 'not provided': 0}
 
 # list of weighted score upper bounds for ctws bins
-ctws_cutoffs = [('Benign', -15),
-                ('Benign/Likely benign', -10),
-                ('Likely benign', -5),
-                ('Uncertain significance', 8),
-                ('Likely pathogenic', 12),
-                ('Pathogenic/Likely pathogenic', 15),
+ctws_cutoffs = [('Benign', -25.8),
+                ('Benign/Likely benign', -6),
+                ('Likely benign', -3.84),
+                ('Uncertain significance', 1.01),
+                ('Likely pathogenic', 3.2),
+                ('Pathogenic/Likely pathogenic', 13.735),
                 ('Pathogenic', 10000000)]
