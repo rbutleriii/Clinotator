@@ -1,5 +1,6 @@
 clinotator/*.py[cod]
 clinotator/__pycache__/
+test/.Rhistory
 Pipfile
 Pipfile.lock
 setup.py
