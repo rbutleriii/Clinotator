@@ -7,8 +7,8 @@ This project takes variants as input and queries NCBI eutilities to generate Cli
 
 *	Clinotator Raw Score -  A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. 
 *	Average Clinical Assertion Age -  The average age of clinical assertions made about a variant.
-*	Clinotator Weighted Significance -  A predicted clinical significance based on the Clinotator Raw Score.
-*	Reclassification Recommendation -  A probabalistic test of the power of the Clinotator Weighted Significance. 
+*	Clinotator Weighted Significance -  A predicted clinical significance based on prediction intervals of the Clinotator Raw Score.
+*	Reclassification Recommendation -  A ranking of the impact of reclassification based on the Clinotator Weighted Significance. 
 
 These and other stats are returned on a per variant basis, in a table, and additionally as vcf annotations if a vcf file is provided. See below for more information. 
 
@@ -106,9 +106,9 @@ Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versi
 	<dt>Clinotator Raw Score (**CTRS**)</dt>
 	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25.  
 
-The age of the assertion is penalized as new data is incorporated into newer assertions as well as previous data, creating a larger set of evidence over time. For years 0-2, there is no penalty, then there is a 10% reduction gradation in weight per year through year 7, at which point the penalty stays at a static 50% reduction thereafter.  
+The age of the assertion is penalized as new data is incorporated into newer assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no penalty, then there is a 10% reduction gradation in weight per year through 6 years , at which point the penalty stays at a static 50% reduction thereafter.  
 
-The assertion type is that largest weight, with values of: Benign(B) = -5, Likely benign(LB) = -3, Uncertain significance(US) = -0.5, Likely pathogenic(LP) = 4 and Pathogenic(P) = 5. For more information on the weighting decisions, see our publication.<sup>6</sup></dd>
+The assertion type is that largest weight, with values of: Benign(B) = -5, Likely benign(LB) = -3, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 1.6 and Pathogenic(P) = 2.9. For more information on the weighting decisions, see our publication.<sup>6</sup></dd>
 </dl>
 <dl>
 	<dt>Average Clinical Assertion Age (**CTAA**)</dt>
@@ -116,7 +116,7 @@ The assertion type is that largest weight, with values of: Benign(B) = -5, Likel
 </dl>
 <dl>
 	<dt>Clinotator Predicted Significance (**CTWS**)</dt>
-	<dd>This is a *predicted* clinical significance based on the weighted distribution of all variants in ClinVar with two or more clinical assertions (as of a Clinotator version release date). The ratings are calculated as previously described, based on confidence intervals from BCa bootstrap resampling of the given classification. See Figure 1 in our publication for details.<sup>6</sup></dd>
+	<dd>This is a *predicted* clinical significance based on the weighted distribution of all variants in ClinVar with two or more clinical assertions (as of a Clinotator version release date). The ratings are calculated as previously described, on nonparametric prediction intervals with a 99% confidence of the given classification. See Figure 1 in our publication for details.<sup>6</sup></dd>
 </dl>
 <dl>
 	<dt>Clinotator Reclassification Recommendation (**CTRR**)</dt>
