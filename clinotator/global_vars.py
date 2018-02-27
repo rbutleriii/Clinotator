@@ -91,5 +91,5 @@ ctws_cutoffs = [('Benign', -25.8),
                 ('Likely benign', -3.84),
                 ('Uncertain significance', 1.01),
                 ('Likely pathogenic', 3.2),
-                ('Pathogenic/Likely pathogenic', 13.735),
+                ('Pathogenic/Likely pathogenic', 14.17),
                 ('Pathogenic', 10000000)]
