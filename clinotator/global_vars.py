@@ -48,8 +48,8 @@ new_headers = ['##INFO=<ID=VID,Number=1,Type=Integer,Description="ClinVar var'
                'aw score">\n',
                '##INFO=<ID=CTAA,Number=A,Type=Float,Description="Clinotator a'
                'verage clinical assertion age">\n',
-               '##INFO=<ID=CTWS,Number=A,Type=String,Description="Clinotator '
-               'weighted significance">\n',
+               '##INFO=<ID=CTPS,Number=A,Type=String,Description="Clinotator '
+               'predicted significance">\n',
                '##INFO=<ID=CTRR,Number=A,Type=String,Description="Clinotator '
                'reclassification recommendation">\n']
 
@@ -74,19 +74,19 @@ cutoff = {'practice guideline': 1.25,
           'no assertion criteria provided': 0.0,
           'no assertion provided': 0.0}
 
-# dict of assertion significances for scoring
-significance = {'Benign': -5,
+# dict of assertion weights for scoring
+significance = {'Benign': -6,
                 'Likely benign': -3,
                 'Uncertain significance': -0.3,
-                'Likely pathogenic': 1.6,
-                'Pathogenic': 2.9,
+                'Likely pathogenic': 3,
+                'Pathogenic': 6,
                 'drug response': 0, 'association': 0, 'risk factor': 0,
                 'protective': 0, 'Affects': 0,
                 'conflicting data from submitters': 0, 'other': 0,
                 'not provided': 0}
 
 # list of weighted score upper bounds for ctws bins
-ctws_cutoffs = [('Benign', -25.8),
+ctps_cutoffs = [('Benign', -25.8),
                 ('Benign/Likely benign', -6),
                 ('Likely benign', -3.84),
                 ('Uncertain significance', 1.01),

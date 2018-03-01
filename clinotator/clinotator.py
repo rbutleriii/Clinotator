@@ -125,7 +125,7 @@ def explode(df, lst_cols, fill_value=''):
 # outfile generation with vcf option
 def output_files(vcf_tbl, variant_objects, outprefix):
     columnz = ['VID', 'CVVT', 'RSID', 'CVMA', 'vcfmatch', 'CVCS', 'CVSZ',
-               'CVNA', 'CVDS', 'CVLE', 'CTRS', 'CTAA', 'CTWS', 'CTRR']
+               'CVNA', 'CVDS', 'CVLE', 'CTRS', 'CTAA', 'CTPS', 'CTRR']
 
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
         for variant in variant_objects])

@@ -115,7 +115,7 @@ The assertion type is that largest weight, with values of: Benign(B) = -5, Likel
 	<dd>As described above, the clinical assertions with criteria provided are counted, and their average age is calculated.</dd>
 </dl>
 <dl>
-	<dt>Clinotator Predicted Significance (**CTWS**)</dt>
+	<dt>Clinotator Predicted Significance (**CTPS**)</dt>
 	<dd>This is a *predicted* clinical significance based on the weighted distribution of all variants in ClinVar with two or more clinical assertions (as of a Clinotator version release date). The ratings are calculated as previously described, on nonparametric prediction intervals with a 99% confidence of the given classification. See Figure 1 in our publication for details.<sup>6</sup></dd>
 </dl>
 <dl>

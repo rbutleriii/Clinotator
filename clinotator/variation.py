@@ -57,7 +57,7 @@ def average_list_age(vid, age_list):
             return np.nanmean(age_list)
 
         except:
-            logging.warn('{} does not have valid clinical assertions!'
+            logging.warn('VID: {} does not have valid clinical assertions!'
                           .format(vid))
             return None
 
@@ -70,30 +70,30 @@ def key_test(test_dict, test_key):
         logging.warn('{} is not an expected key'.format(test_key))
 
 # evaluates reclassification recommendation for CTRR
-def reclassification_tree(ctws_index, cvcs_index):    
-    index_diff = abs(ctws_index - cvcs_index)
+def reclassification_tree(ctps_index, cvcs_index):    
+    index_diff = abs(ctps_index - cvcs_index)
     
     if index_diff == 0:
         return 0
-    elif index_diff == 1 and cvcs_index in (0,1,2,4,5,6) and ctws_index != 3:
+    elif index_diff == 1 and cvcs_index in (0,1,2,4,5,6) and ctps_index != 3:
         return 1
-    elif index_diff == 1 and cvcs_index in (0,1,2,4,5,6) and ctws_index == 3:
+    elif index_diff == 1 and cvcs_index in (0,1,2,4,5,6) and ctps_index == 3:
         return 2
     elif index_diff == 1 and cvcs_index == 3:
         return 2
     elif (index_diff == 2 and cvcs_index in (0, 1, 2)
-            and ctws_index in (0, 1, 2)):
+            and ctps_index in (0, 1, 2)):
         return 2
     elif (index_diff == 2 and cvcs_index in (0, 1, 2)
-            and ctws_index not in (0, 1, 2)):
+            and ctps_index not in (0, 1, 2)):
         return 3
     elif index_diff == 2 and cvcs_index == 3:
         return 3
     elif (index_diff == 2 and cvcs_index in (4, 5, 6)
-            and ctws_index in (4, 5, 6)):
+            and ctps_index in (4, 5, 6)):
         return 2
     elif (index_diff == 2 and cvcs_index in (4, 5, 6)
-            and ctws_index not in (4, 5, 6)):
+            and ctps_index not in (4, 5, 6)):
         return 3
     elif index_diff > 2:
         return 3
@@ -204,44 +204,51 @@ class VariationClass:
                 age_list.append(age)
                 raw_score.append(score * sig_value * age_weight(age))
 
-        self.CTRS = sum(raw_score)
         self.CVNA = len(age_list)
         self.CTAA = average_list_age(self.VID, age_list)
+        logging.debug('VID: {} -> age list size: {}, raw_score size: {}'
+                      .format(self.VID, len(age_list), len(raw_score)))
 
-        logging.debug('age list size: {}, raw_score size: {}'
-                      .format(len(age_list), len(raw_score)))
+        if len(raw_score) > 1:
+            self.CTRS = sum(raw_score)
+        else:
+            self.CTRS = None
+            logging.debug('VID: {} has fewer than 2 complete assertions, no C'
+                          'TRS will be generated'.format(self.VID))
 
-    # calculating the analytical stats: CTWS, CTRR.
+    # calculating the analytical stats: CTPS, CTRR.
     def analysis_stats(self):
         
         if self.CVNA < 2:
-            self.CTWS = None
+            self.CTPS = None
             self.CTRR = 0
             return
         
-        ctws_index = np.digitize(self.CTRS,
-                                [x[1] for x in g.ctws_cutoffs[:6]]).tolist()
-        self.CTWS = g.ctws_cutoffs[ctws_index][0]
+        ctps_index = np.digitize(self.CTRS,
+                                [x[1] for x in g.ctps_cutoffs[:6]]).tolist()
+        self.CTPS = g.ctps_cutoffs[ctps_index][0]
         
         run_already = False
         cvcs_index = None
         for clinsig in self.CVCS.split(', '):
-            if clinsig in [x[0] for x in g.ctws_cutoffs] and not run_already:
+            if clinsig in [x[0] for x in g.ctps_cutoffs] and not run_already:
                 run_already = True
-                cvcs_index = [x[0] for x in g.ctws_cutoffs].index(clinsig)
+                cvcs_index = [x[0] for x in g.ctps_cutoffs].index(clinsig)
             elif clinsig == 'Conflicting interpretations of pathogenicity':
                 run_already = True
                 cvcs_index = 3
-            elif clinsig in [x[0] for x in g.ctws_cutoffs] and run_already:
+            elif clinsig in [x[0] for x in g.ctps_cutoffs] and run_already:
                 logging.warn('multiple CVCS statements for {}, only using fir'
                              'st one!'.format(self.VID))
         
-        if not cvcs_index:
-            self.CTWS = None
+        if cvcs_index is None:
+            logging.warn('No significances for {} are B,B/LB,LB,US,LP,LP/P,P'
+                         .format(self.VID))
+            self.CTPS = None
             self.CTRR = 0
             return
         
-        self.CTRR = reclassification_tree(ctws_index, cvcs_index)
+        self.CTRR = reclassification_tree(ctps_index, cvcs_index)
         
 # test
 if __name__ == '__main__':
