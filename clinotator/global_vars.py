@@ -85,11 +85,11 @@ significance = {'Benign': -6,
                 'conflicting data from submitters': 0, 'other': 0,
                 'not provided': 0}
 
-# list of weighted score upper bounds for ctws bins
-ctps_cutoffs = [('Benign', -25.8),
-                ('Benign/Likely benign', -6),
-                ('Likely benign', -3.84),
-                ('Uncertain significance', 1.01),
-                ('Likely pathogenic', 3.2),
-                ('Pathogenic/Likely pathogenic', 14.17),
+# list of weighted score upper bounds for ctps bins
+ctps_cutoffs = [('Benign', -24),
+                ('Benign/Likely benign', -8.4),
+                ('Likely benign', -4.2),
+                ('Uncertain significance', 4.2),
+                ('Likely pathogenic', 8.4),
+                ('Pathogenic/Likely pathogenic', 15),
                 ('Pathogenic', 10000000)]

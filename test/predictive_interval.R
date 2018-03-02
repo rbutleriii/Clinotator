@@ -2,7 +2,7 @@
 setwd('C:/Users/rbutl/OneDrive/Documents/NCBI Hachathon 2017/Clinotator/test/')
 library(dplyr)
 library(ggplot2)
-big_tbl <- read.csv('clinotator.clinvar_ge_2str.tsv', header=TRUE, sep='\t')
+big_tbl <- read.csv('clinotator.clinvar_ge_2str.tsv', header=TRUE, sep='\t', na.strings='.')
 
 # US distribution
 US_tbl <- filter(big_tbl, grepl('Uncertain significance', CVCS) & CVNA >= 2 & CVSZ == 2)
@@ -47,7 +47,11 @@ cat('P:', median(P_dist), P_PI, 'Quant:', P_quant, '\n')
 
 ##Calibration Values
 # -6, -3, -0.3, 3, 6
-
+# B: -12 -39 -8.4 Quant: -37.2 -8.4 
+# LB: -6 -24 -4.2 Quant: -23.7 -4.2 
+# US: -0.6 -2.37 -0.42 Quant: -2.1 -0.45 
+# LP: 6 4.2 15 Quant: 4.2 12.018 
+# P: 12 8.4 37.2 Quant: 8.4 37.2 
 
 ## Initial Testing 
 # -5, -3, -0.3, 1.6, 2.9

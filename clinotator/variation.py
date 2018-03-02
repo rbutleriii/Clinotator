@@ -209,7 +209,7 @@ class VariationClass:
         logging.debug('VID: {} -> age list size: {}, raw_score size: {}'
                       .format(self.VID, len(age_list), len(raw_score)))
 
-        if len(raw_score) > 1:
+        if len(raw_score) >= 2:
             self.CTRS = sum(raw_score)
         else:
             self.CTRS = None
@@ -242,8 +242,8 @@ class VariationClass:
                              'st one!'.format(self.VID))
         
         if cvcs_index is None:
-            logging.warn('No significances for {} are B,B/LB,LB,US,LP,LP/P,P'
-                         .format(self.VID))
+            logging.warn('ClinVar significance for {} does not include B,B/LB'
+                         ',LB,US,LP,LP/P,P'.format(self.VID))
             self.CTPS = None
             self.CTRR = 0
             return

@@ -10,6 +10,7 @@ See main, eventually tests will be added for this module
 
 import logging
 import sys
+import time
 import Bio.Entrez as Entrez
 import global_vars as g
 try:
@@ -23,6 +24,7 @@ Entrez.tool = g.etool
 # getting xml variation files for query_results list, 
 def get_ncbi_xml(file_type, id_list, query_results):
     logging.debug('{} list -> {}'.format(file_type, id_list))
+    start = time.perf_counter()
     staging_list = []
     id_list = list(filter(None, id_list)) # costs ~ 6 sec per 50k list
 
@@ -44,7 +46,9 @@ def get_ncbi_xml(file_type, id_list, query_results):
                rettype='variation', retmax=g.batch_size, webenv=webenv1,
                query_key=query_key1)
     [query_results.append(batch) for batch in staging_list] 
-    logging.debug('batches run -> {}'.format(len(query_results)))
+    stop = time.perf_counter()
+    logging.debug('Download time: {} min, Batches run -> {}'
+                  .format(((stop-start)/60), len(query_results)))
     return
 
 # epost or elink list to e-utilities history server for target db. 
