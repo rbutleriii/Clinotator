@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 '''
 Clinotator - Clinical interpretation of ambiguous ClinVar annotations
