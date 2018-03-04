@@ -60,7 +60,7 @@ def vcf_prep(file_object, outprefix):
     header_count = parse_header(file_object, outprefix)
     vcf_tbl = pd.read_table(file_object, skiprows=header_count, dtype=str)
     logging.debug('vcf_tbl shape -> {}'.format(vcf_tbl.shape))
-    vcf_list = vcf_tbl.loc[vcf_tbl['ID'].ne('.'), 'ID'].unique().tolist()
+    vcf_list = vcf_tbl.ID.values[vcf_tbl.ID.values != '.'].tolist()
     return vcf_list, vcf_tbl
 
 # concatenates new info into variants that match rsid and alt

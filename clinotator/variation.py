@@ -14,6 +14,8 @@ import pprint
 import logging
 import datetime
 import warnings
+import decimal
+from math import fsum
 import numpy as np
 import xml.etree.ElementTree as ET
 import global_vars as g
@@ -202,15 +204,20 @@ class VariationClass:
                     continue
                     
                 age_list.append(age)
-                raw_score.append(score * sig_value * age_weight(age))
+                D = decimal.Decimal
+                raw_score.append(float(D(str(score)) * D(str(sig_value))
+                                 * D(str(age_weight(age)))))
+                logging.debug('score: {} sig_value: {} age_weight: {} age: {}'
+                              .format(score, sig_value, age_weight(age), age))
 
         self.CVNA = len(age_list)
         self.CTAA = average_list_age(self.VID, age_list)
-        logging.debug('VID: {} -> age list size: {}, raw_score size: {}'
-                      .format(self.VID, len(age_list), len(raw_score)))
+        # logging.debug('VID: {} -> age list size: {}, raw_score size: {}'
+        #               .format(self.VID, len(age_list), len(raw_score)))
 
         if len(raw_score) >= 2:
-            self.CTRS = sum(raw_score)
+            # logging.debug('raw_score list {}'.format(raw_score))
+            self.CTRS = fsum(raw_score)
         else:
             self.CTRS = None
             logging.debug('VID: {} has fewer than 2 complete assertions, no C'
@@ -224,8 +231,10 @@ class VariationClass:
             self.CTRR = 0
             return
         
-        ctps_index = np.digitize(self.CTRS,
-                                [x[1] for x in g.ctps_cutoffs[:6]]).tolist()
+        # logging.debug('CTRS score: {}'.format(self.CTRS))
+        bins = [x[1] for x in g.ctps_cutoffs[:6]]
+        bins = np.nextafter(bins, np.minimum(bins,0))
+        ctps_index = np.digitize(self.CTRS, bins, right=True).tolist()
         self.CTPS = g.ctps_cutoffs[ctps_index][0]
         
         run_already = False

@@ -73,18 +73,18 @@ def input_selection(file_type, file, outprefix, query_results):
         with open(file) as f:
 
             if file_type == 'vid':
-                id_list = [line.rstrip('\n') for line in f]
+                id_list = np.unique([line.rstrip('\n') for line in f])
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
                 return False
         
             elif file_type == 'rsid':
-                id_list = [line.lstrip('rsRS').rstrip('\n') for line in f]
+                id_list = np.unique([line.lstrip('rsRS').rstrip('\n') for line in f])
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
                 return False
             
             elif file_type == 'vcf':
                 vcf_list, vcf_tbl = vcf.vcf_prep(f, outprefix)
-                id_list = [item.lstrip('rs') for item in vcf_list]
+                id_list = np.unique([item.lstrip('rs') for item in vcf_list])
                 getncbi.get_ncbi_xml('rsid', id_list, query_results)
                 return vcf_tbl
                 
@@ -130,7 +130,8 @@ def output_files(vcf_tbl, variant_objects, outprefix):
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
         for variant in variant_objects])
     result_tbl = result_tbl[columnz]
-    # result_tbl = result_tbl.sort_values(by='VID', axis=1)
+    result_tbl['VID'] = result_tbl['VID'].astype(int)
+    result_tbl.sort_values(by='VID', inplace=True)
     logging.debug('result_tbl shape -> {}'.format(result_tbl.shape))
 
     out_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='.')
