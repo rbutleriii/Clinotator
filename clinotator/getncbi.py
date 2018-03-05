@@ -21,10 +21,17 @@ except ImportError:
 
 Entrez.tool = g.etool
 
+# timing compatibility with python2
+def timing_tool():
+    try:
+        return time.perf_counter()
+    except:
+        return time.time()
+
 # getting xml variation files for query_results list, 
 def get_ncbi_xml(file_type, id_list, query_results):
     logging.debug('{} list -> {}'.format(file_type, id_list))
-    start = time.perf_counter()
+    start = timing_tool()
     staging_list = []
     id_list = list(filter(None, id_list)) # costs ~ 6 sec per 50k list
 
@@ -46,7 +53,7 @@ def get_ncbi_xml(file_type, id_list, query_results):
                rettype='variation', retmax=g.batch_size, webenv=webenv1,
                query_key=query_key1)
     [query_results.append(batch) for batch in staging_list] 
-    stop = time.perf_counter()
+    stop = timing_tool()
     logging.debug('Download time: {} min, Batches run -> {}'
                   .format(((stop-start)/60), len(query_results)))
     return

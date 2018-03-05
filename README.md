@@ -3,7 +3,7 @@
 
 ### Clinical interpretation of ambiguous ClinVar annotations
 
-This project takes variants as input and queries NCBI eutilities to generate ClinVar Variation Report[1] scoring metrics. The overall goal is to generate annotations of use for given batches of variants to inform clinical interpretation. The metrics include:
+This project takes variants as input and queries NCBI eutilities to generate ClinVar Variation Report<sup>1</sup> scoring metrics. The overall goal is to generate annotations of use for given batches of variants to inform clinical interpretation. The metrics include:
 
 *	Clinotator Raw Score -  A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. 
 *	Average Clinical Assertion Age -  The average age of clinical assertions made about a variant.
@@ -37,11 +37,11 @@ required arguments:
 
 ### Minimum Inputs
 
-Three required bits of information: (1) the type of input file, (2) the file itself and (3) your email address. The input comes as either a text ID list file, or a vcf. If a vcf(s) is selected, clinotator will generate an annotated output file. In all cases a tab-delimited table file will be produced. The email is required by NCBI/biopython as NCBI enforces a strict 3 queries per second limit. Before they ban your IP address they will attempt to contact you, but that should not be a problem as clinotator uses batch queries and the history server.
+Three required bits of information: **(1)** the type of input file, **(2)** the file itself and **(3)** your email address. The input file should be either a single column of IDs in a text file, or a vcf. If a vcf(s) is selected, clinotator will generate an annotated output file. In all cases a tab-delimited table file will be produced. The email is required by NCBI/biopython as NCBI enforces a strict 3 queries per second limit. Before they ban your IP address they will attempt to contact you, but that should not be a problem as clinotator uses batch queries and the history server.
 
 ### Optional Arguments
 
-Additional arguments include a log file and specification of the output file prefix.
+Additional arguments include a log file (clinotator.log) and specification of the output file prefix (the default is clinotator).
 
 ## Motivation
 
@@ -49,11 +49,30 @@ While ClinVar has become an indispensable resource for clinical variant interpre
 
 ## Installation
 
-Implemented in python3 (tested >=3.5). You can `git clone` or download the zipfile and unpack as you like. Add the location to your ~/.bash_profile or:
+Implemented in python (tested on 2.7.12 and >=3.4). You can `git clone` or download the zipfile and unpack as you like. Add the location to your ~/.bash_profile or:
 
 ```
-export PATH=$PATH:path/to/folder/clinotator
+export PATH=$PATH:path/to/folder/Clinotator/clinotator
 ``` 
+
+Examples of each input file type are provided in the test subfolder. If you have pyenv and tox you can test the installation using the tox.ini file provided. Otherwise, you can try it by simply running:
+
+```
+cd path/to/Clinotator/test
+clinotator.py -t vid -e A.N.Other@example.com test.vid
+```
+
+You should get the following warnings and a clinotator.test.tsv file:
+
+```
+Going to download record 1 to 13
+WARNING:root:128294 has a missing assertion date!
+WARNING:root:128297 has a missing assertion date!
+WARNING:root:ClinVar significance for 3521 does not include B,B/LB,LB,US,LP,LP/P,P
+WARNING:root:VID: 55794 does not have valid clinical assertions!
+```
+
+The warnings, as well as some additional information can be stored in the log file with `--log`
 
 ### Dependencies
 
@@ -76,34 +95,34 @@ Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versi
 ### ClinVar Metrics
 
 <dl>
-	<dt>ClinVar Clinical Significance (**CVCS**)</dt>
+	<dt>ClinVar Clinical Significance (CVCS)</dt>
 	<dd>Clinical significance reported by ClinVar.<sup>2</sup> Ratings metrics are based on the five ACMG/AMP recommended classifications for Mendelian disorders: Benign, Likely benign, Uncertain significance, Likely pathogenic and Pathogenic. Other Clinical significance values are reported, but not factored into the Clinotator metrics.</dd>
 </dl>
 <dl>
-	<dt>ClinVar Stars (**CVSZ**)</dt>
+	<dt>ClinVar Stars (CVSZ)</dt>
 	<dd>Star rating given by clinvar. Ranges from zero to four.<sup>3</sup></dd>
 </dl>
 <dl>
-	<dt>ClinVar Number of Clinical Assertions (**CVNA**)</dt>
+	<dt>ClinVar Number of Clinical Assertions (CVNA)</dt>
 	<dd>The number of Clinvar Submissions possessing a clinical assertion (with criteria provided). This measure excludes submissions without assertion criteria, including "literature reviews", which are a type of evidence as opposed to an assertion. Additionally, submitter assertions without defined criteria are also omitted. Most assertions with criteria meet or exceed the guidelines put for by the American College of Medical Genetics and Genomics (ACMG) in 2013 and amended in 2015.<sup>4,5</sup></dd>
 </dl>
 <dl>
-	<dt>ClinVar Conditions/Diseases (**CVDS**)</dt>
+	<dt>ClinVar Conditions/Diseases (CVDS)</dt>
 	<dd>Conditions reported to be associated with this variant.</dd>
 </dl>
 <dl>
-	<dt>ClinVar Last Evaluated (**CVLE**)</dt>
+	<dt>ClinVar Last Evaluated (CVLE)</dt>
 	<dd>The date the clinical significance of the variation report was last evaluated. Note this is not the date the variation report was last updated, but the date in the \<ClinicalAssertionList\> field of the ClinVar xml connected to the Review Status.</dd>
 </dl>
 <dl>
-	<dt>ClinVar Variant Type (**CVVT**)</dt>
+	<dt>ClinVar Variant Type (CVVT)</dt>
 	<dd>The type of variation in ClinVar. Currently defined as either "Simple" with a single AlleleID or "Haplotype" if multiple AlleleIDs are involved.</dd>
 </dl>
 
 ### Clinotator Metrics
 
 <dl>
-	<dt>Clinotator Raw Score (**CTRS**)</dt>
+	<dt>Clinotator Raw Score (CTRS)</dt>
 	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25.  
 
 The age of the assertion is penalized as new data is incorporated into newer assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no penalty, then there is a 10% reduction gradation in weight per year through 6 years , at which point the penalty stays at a static 50% reduction thereafter.  
@@ -111,21 +130,21 @@ The age of the assertion is penalized as new data is incorporated into newer ass
 The assertion type is that largest weight, with values of: Benign(B) = -5, Likely benign(LB) = -3, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 1.6 and Pathogenic(P) = 2.9. For more information on the weighting decisions, see our publication.<sup>6</sup></dd>
 </dl>
 <dl>
-	<dt>Average Clinical Assertion Age (**CTAA**)</dt>
+	<dt>Average Clinical Assertion Age (CTAA)</dt>
 	<dd>As described above, the clinical assertions with criteria provided are counted, and their average age is calculated.</dd>
 </dl>
 <dl>
-	<dt>Clinotator Predicted Significance (**CTPS**)</dt>
+	<dt>Clinotator Predicted Significance (CTPS)</dt>
 	<dd>This is a *predicted* clinical significance based on the weighted distribution of all variants in ClinVar with two or more clinical assertions (as of a Clinotator version release date). The ratings are calculated as previously described, on nonparametric prediction intervals with a 99% confidence of the given classification. See Figure 1 in our publication for details.<sup>6</sup></dd>
 </dl>
 <dl>
-	<dt>Clinotator Reclassification Recommendation (**CTRR**)</dt>
+	<dt>Clinotator Reclassification Recommendation (CTRR)</dt>
 	<dd>This field ranks reclassification priority based on the difference between the CVCS and the CTWS. This field only includes the seven values of clinical significance associated with Mendelian diseases (B, B/LB, LB, US/CI, LP, LP/P, P). For the purposes of reclassification, "Conflicting interpretations of pathogenicity" is scored the same as Uncertain significance.</dd>
 </dl>
 
-*	0 - Reclassification unlikely, consistent identity or 
-*	1 - Low priority reclassification, change of low impact
-*	2 - Medium priority reclassification, minor change of clinical impact
+*	0 - Reclassification unlikely, consistent identity or insufficient information for a recommendation
+*	1 - Low priority reclassification, minor change without clinical impact
+*	2 - Medium priority reclassification, minor change of some clinical impact
 *	3 - High priority reclassification, significant change in clinical impact
 
 <dl>
