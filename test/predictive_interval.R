@@ -45,7 +45,7 @@ cat('US:', median(US_dist), US_PI, 'Quant:', US_quant, '\n')
 cat('LP:', median(LP_dist), LP_PI, 'Quant:', LP_quant, '\n')
 cat('P:', median(P_dist), P_PI, 'Quant:', P_quant, '\n')
 
-##Calibration Values
+##Final Calibration Values
 # -6, -3, -0.3, 3, 6
 # B: -12 -39 -8.4 Quant: -37.2 -8.4 
 # LB: -6 -24 -4.2 Quant: -23.7 -4.2 
