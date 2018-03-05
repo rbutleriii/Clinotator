@@ -7,9 +7,9 @@ big_tbl <- read.csv('clinotator.clinvar_ge_2str.tsv', header=TRUE, sep='\t', na.
 # US distribution
 US_tbl <- filter(big_tbl, grepl('Uncertain significance', CVCS) & CVNA >= 2 & CVSZ == 2)
 US_dist <- sort(US_tbl$CTRS)
-US_cth <- floor((0.01/2) * (length(US_dist) + 1))
+US_cth <- floor((0.005/2) * (length(US_dist) + 1))
 US_PI <- c(US_dist[US_cth], US_dist[length(US_dist) - US_cth + 1])
-US_quant <- quantile(US_dist, probs = c(0.01, 0.99))
+US_quant <- quantile(US_dist, probs = c(0.001, 0.999))
 
 # LP distribution
 LP_tbl <- filter(big_tbl, grepl('^Likely pathogenic', CVCS) & CVNA >= 2 & CVSZ == 2)
@@ -49,7 +49,7 @@ cat('P:', median(P_dist), P_PI, 'Quant:', P_quant, '\n')
 # -6, -3, -0.3, 3, 6
 # B: -12 -39 -8.4 Quant: -37.2 -8.4 
 # LB: -6 -24 -4.2 Quant: -23.7 -4.2 
-# US: -0.6 -2.37 -0.42 Quant: -2.1 -0.45 
+# US: -0.6 -2.55 -0.39 Quant: -2.71 -0.36 
 # LP: 6 4.2 15 Quant: 4.2 12.018 
 # P: 12 8.4 37.2 Quant: 8.4 37.2 
 
