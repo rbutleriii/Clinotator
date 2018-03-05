@@ -182,7 +182,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <sup>1</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/variation_report/  
 <sup>2</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/  
 <sup>3</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/  
-<sup>4</sup>  Green, R. C., et al. (2013). "ACMG recommendations for reporting of incidental findings in clinical exome and genome sequencing." Genet Med 15(7): 565-574.
-<sup>5</sup>  Richards, S., et al. (2015). "Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology." Genet Med 17(5): 405-424.
+<sup>4</sup>  Green, R. C., et al. (2013). "ACMG recommendations for reporting of incidental findings in clinical exome and genome sequencing." Genet Med 15(7): 565-574.  
+<sup>5</sup>  Richards, S., et al. (2015). "Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology." Genet Med 17(5): 405-424.  
 <sup>6</sup>  Our paper  
-
