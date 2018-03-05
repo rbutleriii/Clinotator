@@ -104,7 +104,7 @@ Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versi
 </dl>
 <dl>
 	<dt>ClinVar Number of Clinical Assertions (CVNA)</dt>
-	<dd>The number of Clinvar Submissions possessing a clinical assertion (with criteria provided). This measure excludes submissions without assertion criteria, including "literature reviews", which are a type of evidence as opposed to an assertion. Additionally, submitter assertions without defined criteria are also omitted. Most assertions with criteria meet or exceed the guidelines put for by the American College of Medical Genetics and Genomics (ACMG) in 2013 and amended in 2015.<sup>4,5</sup></dd>
+	<dd>The number of Clinvar Submissions possessing a clinical assertion (with criteria provided). This measure excludes submissions without assertion criteria, including "literature reviews", which are a type of evidence as opposed to an assertion. Additionally, submitter assertions without defined criteria are also omitted. Most assertions with criteria meet or exceed the guidelines put forth by the American College of Medical Genetics and Genomics (ACMG) in 2013 and amended in 2015.<sup>4,5</sup></dd>
 </dl>
 <dl>
 	<dt>ClinVar Conditions/Diseases (CVDS)</dt>
@@ -182,7 +182,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <sup>1</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/variation_report/  
 <sup>2</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/  
 <sup>3</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/  
-<sup>4</sup>  ACMG Guidelines 2013  
-<sup>5</sup>  ACMG Guidelines 2015  
+<sup>4</sup>  Green, R. C., et al. (2013). "ACMG recommendations for reporting of incidental findings in clinical exome and genome sequencing." Genet Med 15(7): 565-574.
+<sup>5</sup>  Richards, S., et al. (2015). "Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology." Genet Med 17(5): 405-424.
 <sup>6</sup>  Our paper  
 
