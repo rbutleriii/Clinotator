@@ -55,14 +55,14 @@ Implemented in python (tested on 2.7.12 and >=3.4). You can `git clone` or downl
 export PATH=$PATH:path/to/folder/Clinotator/clinotator
 ``` 
 
-Examples of each input file type are provided in the test subfolder. If you have pyenv and tox you can test the installation using the tox.ini file provided. Otherwise, you can try it by simply running:
+Examples of each input file type are provided in the test subfolder. For instance:
 
 ```
 cd path/to/Clinotator/test
 clinotator.py -t vid -e A.N.Other@example.com test.vid
 ```
 
-You should get the following warnings and a clinotator.test.tsv file:
+Should produce the following warnings and a clinotator.test.tsv file:
 
 ```
 Going to download record 1 to 13
