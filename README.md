@@ -127,7 +127,7 @@ Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versi
 
 The age of the assertion is penalized as new data is incorporated into newer assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no penalty, then there is a 10% reduction gradation in weight per year through 6 years , at which point the penalty stays at a static 50% reduction thereafter.  
 
-The assertion type is that largest weight, with values of: Benign(B) = -5, Likely benign(LB) = -3, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 1.6 and Pathogenic(P) = 2.9. For more information on the weighting decisions, see our publication.<sup>6</sup></dd>
+The assertion type is that largest weight, with values of: Benign(B) = -6, Likely benign(LB) = -3, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 3 and Pathogenic(P) = 6. For more information on the weighting decisions, see our publication.<sup>6</sup></dd>
 </dl>
 <dl>
 	<dt>Average Clinical Assertion Age (CTAA)</dt>
@@ -135,7 +135,7 @@ The assertion type is that largest weight, with values of: Benign(B) = -5, Likel
 </dl>
 <dl>
 	<dt>Clinotator Predicted Significance (CTPS)</dt>
-	<dd>This is a *predicted* clinical significance based on the weighted distribution of all variants in ClinVar with two or more clinical assertions (as of a Clinotator version release date). The ratings are calculated as previously described, on nonparametric prediction intervals with a 99% confidence of the given classification. See Figure 1 in our publication for details.<sup>6</sup></dd>
+	<dd>This is a *predicted* clinical significance based on the weighted distribution of all variants in ClinVar with two or more clinical assertions (as of a Clinotator version release date). The ratings are calculated as previously described, on nonparametric prediction intervals with a given confidence of classification. See Figure 1 in our publication for details.<sup>6</sup></dd>
 </dl>
 <dl>
 	<dt>Clinotator Reclassification Recommendation (CTRR)</dt>
