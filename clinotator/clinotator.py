@@ -48,6 +48,7 @@ def getargs():
                             description='Clinical interpretation of ambiguous'
                                         ' ClinVar annotations')
     parser.add_argument('--log', action='store_true', help='create logfile')
+    parser.add_argument('--long-log', action='store_true', help='create detailed logfile')
     parser.add_argument('-o', metavar='prefix', dest='outprefix',
                         default='clinotator',
                         help='choose an alternate prefix for outfiles')
@@ -66,6 +67,17 @@ def getargs():
                                     'rsid - dbSNP rsID list\n'
                                     'vcf - vcf file (output vcf generated)')
     return parser.parse_args()
+
+# choosing log options
+def log_opts(log, long_log, outprefix):
+    if log:
+        logging.basicConfig(level=logging.WARN,
+                            filename="{}.log".format(outprefix))
+    elif long_log:
+        logging.basicConfig(level=logging.DEBUG,
+                            filename="{}.log".format(outprefix))
+    else:
+        logging.basicConfig(level=logging.DEBUG)
 
 # how to handle file types, returns vcf_tbl or False for output 
 def input_selection(file_type, file, outprefix, query_results):
@@ -96,6 +108,7 @@ def input_selection(file_type, file, outprefix, query_results):
         logging.fatal(error_handling())
 
 # exploding list cells in dataframe into separate rows.
+# function courtesy of @MaxU on stackoverflow question-12680754
 def explode(df, lst_cols, fill_value=''):
     # make sure `lst_cols` is a list
     if lst_cols and not isinstance(lst_cols, list):
@@ -149,15 +162,10 @@ def output_files(vcf_tbl, variant_objects, outprefix):
     
 def main():
     args = getargs()
-    
-    if args.log:
-        logging.basicConfig(level=logging.DEBUG, filename="clinotator.log")
-    else:
-        logging.basicConfig(level=logging.WARN)
-
-    Entrez.email = args.email
+    log_opts(args.log, args.long_log, args.outprefix)
     logging.debug('CLI inputs are {} {} {} {}'
                   .format(args.type, args.email, args.input, args.outprefix))
+    Entrez.email = args.email
     
     for file in args.input:
         query_results = []
