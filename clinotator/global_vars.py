@@ -10,13 +10,14 @@ Copyright (C) 2017  Robert R Butler III
 See main, eventually tests will be added for this module
 '''
 
-__version__ = "0.2.4"
+__version__ = "0.3.0"
 
 
 ### getncbi.py global variables 
 
 # batch size for querying NCBI, not above 5000
-batch_size = 4500
+elink_batch = 1000
+efetch_batch = 4500
 
 # name of software for ncbi query tagging (preferred by NCBI)
 etool = 'Clinotator'
