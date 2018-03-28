@@ -77,7 +77,7 @@ def log_opts(log, long_log, outprefix):
         logging.basicConfig(level=logging.DEBUG,
                             filename="{}.log".format(outprefix))
     else:
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.WARN)
 
 # how to handle file types, returns vcf_tbl or False for output 
 def input_selection(file_type, file, outprefix, query_results):
@@ -101,11 +101,11 @@ def input_selection(file_type, file, outprefix, query_results):
                 return vcf_tbl
                 
     except IOError as e:
-        logging.fatal(error_handling())
+        logging.critical(error_handling())
         print('Unable to open file, {}'.format(error_handling()))
     
     except:
-        logging.fatal(error_handling())
+        logging.critical(error_handling())
 
 # exploding list cells in dataframe into separate rows.
 # function courtesy of @MaxU on stackoverflow question-12680754
@@ -160,6 +160,7 @@ def output_files(vcf_tbl, variant_objects, outprefix):
                        index=False, na_rep='.')
     return
     
+
 def main():
     args = getargs()
     log_opts(args.log, args.long_log, args.outprefix)
@@ -168,6 +169,7 @@ def main():
     Entrez.email = args.email
     
     for file in args.input:
+        logging.warning('Starting on {}'.format(file))
         query_results = []
         variant_objects = []
         base = os.path.basename(file)
@@ -183,7 +185,7 @@ def main():
         
         output_files(vcf_tbl, variant_objects, outprefix)
         logging.debug('file written to {}.tsv'.format(outprefix))
-        sys.exit()
+    sys.exit()
 
 if __name__ == '__main__':
     main()

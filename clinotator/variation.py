@@ -59,7 +59,7 @@ def average_list_age(vid, age_list):
             return np.nanmean(age_list)
 
         except:
-            logging.warn('VID: {} does not have valid clinical assertions!'
+            logging.warning('VID: {} does not have valid clinical assertions!'
                           .format(vid))
             return None
 
@@ -69,7 +69,7 @@ def key_test(test_dict, test_key):
     try:
         return test_dict[test_key]
     except KeyError:
-        logging.warn('{} is not an expected key'.format(test_key))
+        logging.warning('{} is not an expected key'.format(test_key))
 
 # evaluates reclassification recommendation for CTRR
 def reclassification_tree(ctps_index, cvcs_index):    
@@ -172,7 +172,7 @@ class VariationClass:
 
             elif (observation.get('VariationID') == self.VID and
                     run_already):
-                logging.warn('{} has multiple observation fields in its recor'
+                logging.warning('{} has multiple observation fields in its recor'
                              'd omitting as an annotation error. Check rsid(s'
                              ') {} manually'.format(self.VID, self.RSID))
                 continue
@@ -199,7 +199,7 @@ class VariationClass:
                                         .find('./ClinicalSignificance')
                                         .get('DateLastEvaluated'))
                 except:
-                    logging.warn('{} has a missing assertion date!'
+                    logging.warning('{} has a missing assertion date!'
                                  .format(self.VID))
                     continue
                     
@@ -247,11 +247,11 @@ class VariationClass:
                 run_already = True
                 cvcs_index = 3
             elif clinsig in [x[0] for x in g.ctps_cutoffs] and run_already:
-                logging.warn('multiple CVCS statements for {}, only using fir'
-                             'st one!'.format(self.VID))
+                logging.warning('multiple CVCS statements for {}, only using '
+                             'first one!'.format(self.VID))
         
         if cvcs_index is None:
-            logging.warn('ClinVar significance for {} does not include B,B/LB'
+            logging.warning('ClinVar significance for {} does not include B,B/LB'
                          ',LB,US,LP,LP/P,P'.format(self.VID))
             self.CTPS = None
             self.CTRR = 0

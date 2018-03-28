@@ -15,7 +15,7 @@ These and other stats are returned on a per variant basis, in a table, and addit
 ## Code Example
 
 ```bash
-usage: clinotator.py [-h] [--log] [-o prefix] [--version] -e EMAIL -t {vid,rsid,vcf} file [file ...]
+usage: clinotator.py [-h] [--log] [--long-log] [-o prefix] [--version] -e EMAIL -t {vid,rsid,vcf} file [file ...]
 
 Clinical interpretation of ambiguous ClinVar annotations
 
@@ -25,6 +25,7 @@ positional arguments:
 optional arguments:
   -h, --help         show this help message and exit
   --log              create logfile
+  --long-log         create detailed logfile
   -o prefix          choose an alternate prefix for outfiles
   --version          show program's version number and exit
 
@@ -72,7 +73,7 @@ WARNING:root:ClinVar significance for 3521 does not include B,B/LB,LB,US,LP,LP/P
 WARNING:root:VID: 55794 does not have valid clinical assertions!
 ```
 
-The warnings, as well as some additional information can be stored in the log file with `--log`
+The warnings, as well as some additional information can be stored in the log file with `--log`. `--long-log` will store detailed debugging information, but the file will be larger than the output tsv file. Both log files append information, so batch runs or especially large lists of variants may result in large file sizes.
 
 ### Dependencies
 
