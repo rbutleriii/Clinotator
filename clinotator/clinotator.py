@@ -71,13 +71,13 @@ def getargs():
 # choosing log options
 def log_opts(log, long_log, outprefix):
     if log:
-        logging.basicConfig(level=logging.WARN,
+        logging.basicConfig(level=logging.INFO,
                             filename="{}.log".format(outprefix))
     elif long_log:
         logging.basicConfig(level=logging.DEBUG,
                             filename="{}.log".format(outprefix))
     else:
-        logging.basicConfig(level=logging.WARN)
+        logging.basicConfig(level=logging.INFO)
 
 # how to handle file types, returns vcf_tbl or False for output 
 def input_selection(file_type, file, outprefix, query_results):
@@ -141,7 +141,7 @@ def output_files(vcf_tbl, variant_objects, outprefix):
                'CVNA', 'CVDS', 'CVLE', 'CTRS', 'CTAA', 'CTPS', 'CTRR']
 
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
-        for variant in variant_objects])
+            for variant in variant_objects])
     result_tbl = result_tbl[columnz]
     result_tbl['VID'] = result_tbl['VID'].astype(int)
     result_tbl.sort_values(by='VID', inplace=True)
@@ -169,7 +169,7 @@ def main():
     Entrez.email = args.email
     
     for file in args.input:
-        logging.warning('Starting on {}'.format(file))
+        logging.info('Starting on {}'.format(file))
         query_results = []
         variant_objects = []
         base = os.path.basename(file)
