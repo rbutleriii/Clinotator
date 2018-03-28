@@ -28,8 +28,8 @@ def parse_header(file_object, outprefix):
         with open('{}.anno.vcf'.format(outprefix), 'w') as outfile:
             header = []
             info_list = []
-            for index, line in enumerate(next(file_object)
-                                         for x in range(g.max_vcf_header_size)):
+            for index, line in enumerate(
+                    next(file_object) for x in range(g.max_vcf_header_size)):
                 m = re.match('##(\w+)=', line)
                 
                 if m and m.group(1) == 'INFO':
