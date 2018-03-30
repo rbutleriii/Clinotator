@@ -99,7 +99,7 @@ Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versi
 
 ### Memory/System requirements
 
-Clinotator was designed in a Linux environment and implemented in Python (2.7 or >=3.4) 29, and can run in similar OSX and possibly Windows Python environments. It can be run on a personal computer with relatively modest system requirements; a minimum of 2GB available RAM.  
+Clinotator was designed in a Linux environment and implemented in Python (2.7 or >=3.4), and can run in similar OSX and possibly Windows Python environments. It can be run on a personal computer with relatively modest system requirements; a minimum of 2GB available RAM.  
 
 As Clinotator keeps the NCBI xml results in memory, there is a significant memory usage. At the time of writing, the entire ClinVar xml set is approaching 6GB. Loading the entire set into memory is doable with at least 8GB of memory, though it is recommended that you batch your queries in this rare case. More typical usage for subsets of ClinVar or batch vcf annotations should not pose a memory issue.
 
