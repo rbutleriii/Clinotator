@@ -95,6 +95,12 @@ pandas==0.22.0
 
 Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versions if possible.
 
+### Memory/System requirements
+
+Clinotator was designed in a Linux environment and implemented in Python (2.7 or >=3.4) 29, and can run in similar OSX and possibly Windows Python environments. It can be run on a personal computer with relatively modest system requirements; a minimum of 2GB available RAM.  
+
+As Clinotator keeps the NCBI xml results in memory, there is a significant memory usage. At the time of writing, the entire ClinVar xml set is approaching 6GB. Loading the entire set into memory is doable with at least 8GB of memory, though it is recommended that you batch your queries in this rare case. More typical usage for subsets of ClinVar or batch vcf annotations should not pose a memory issue.
+
 ## Details on metrics
 
 ### ClinVar Metrics
@@ -128,11 +134,7 @@ Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versi
 
 <dl>
 	<dt>Clinotator Raw Score (CTRS)</dt>
-	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25.  
-  
-The age of the assertion is weighted as new data is incorporated into assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no weight, then there is a 10% reduction in weight per year through 6 years , at which point the penalty stays at a static 50% weight thereafter.  
-
-The assertion type is that largest weight, with values of: Benign(B) = -6, Likely benign(LB) = -3, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 3 and Pathogenic(P) = 6. For more information on the weighting decisions, see our publication.<sup>5</sup></dd>
+	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25.<br /><br /> The age of the assertion is weighted as new data is incorporated into assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no weight, then there is a 10% reduction in weight per year through 6 years , at which point the penalty stays at a static 50% weight thereafter.<br /><br /> The assertion type is that largest weight, with values of: Benign(B) = -6, Likely benign(LB) = -3, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 3 and Pathogenic(P) = 6. For more information on the weighting decisions, see our publication.<sup>5</sup></dd>
 </dl>
 <dl>
 	<dt>Average Clinical Assertion Age (CTAA)</dt>
