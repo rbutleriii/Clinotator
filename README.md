@@ -165,7 +165,16 @@ As Clinotator keeps the NCBI xml results in memory, there is a significant memor
 Citation
 
 '''
-BibTex format citation coming soon
+@article{key ,
+author = {Robert R Butler III and Pablo V Gejman},
+title = {Clinotator: analyzing ClinVar variation reports to prioritize reclassification efforts [version 1; referees: awaiting peer review]},
+journal = {F1000Research},
+volume = {7},
+year = {2018},
+pages = {462},
+doi = {10.12688/f1000research.14470.1},
+url = {http://dx.doi.org/10.12688/f1000research.14470.1}
+}
 '''
 
 
@@ -192,4 +201,4 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <sup>2</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/  
 <sup>3</sup>  Richards, S., et al. (2015). "Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology." Genet Med 17(5): 405-424.  
 <sup>4</sup>  https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/  
-<sup>5</sup>  Our paper, Coming Soon  
+<sup>5</sup>  Butler RR and Gejman PV. (2018). "Clinotator: analyzing ClinVar variation reports to prioritize reclassification efforts" [version 1; referees: awaiting peer review]. F1000Research 7:462. (doi: 10.12688/f1000research.14470.1)  
