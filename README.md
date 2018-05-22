@@ -136,7 +136,7 @@ As Clinotator keeps the NCBI xml results in memory, there is a significant memor
 
 <dl>
 	<dt>Clinotator Raw Score (CTRS)</dt>
-	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25.<br /><br /> The age of the assertion is weighted as new data is incorporated into assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no weight, then there is a 10% reduction in weight per year through 6 years , at which point the penalty stays at a static 50% weight thereafter.<br /><br /> The assertion type is that largest weight, with values of: Benign(B) = -6, Likely benign(LB) = -3, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 3 and Pathogenic(P) = 6. For more information on the weighting decisions, see our publication.<sup>5</sup></dd>
+	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25.<br /><br /> The age of the assertion is weighted as new data is incorporated into assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no weight, then there is a 10% reduction in weight per year through 6 years , at which point the penalty stays at a static 50% weight reduction thereafter.<br /><br /> The assertion type is the largest weight, with values of: Benign(B) = -6, Likely benign(LB) = -3, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 3 and Pathogenic(P) = 6. For more information on the weighting decisions, see our publication.<sup>5</sup></dd>
 </dl>
 <dl>
 	<dt>Average Clinical Assertion Age (CTAA)</dt>
@@ -148,7 +148,7 @@ As Clinotator keeps the NCBI xml results in memory, there is a significant memor
 </dl>
 <dl>
 	<dt>Clinotator Reclassification Recommendation (CTRR)</dt>
-	<dd>This field ranks reclassification priority based on the difference between the CVCS and the CTWS. This field only includes the seven values of ClinVar clinical significance associated with Mendelian diseases (B, B/LB, LB, US/CI, LP, LP/P, P). For the purposes of reclassification, "Conflicting interpretations of pathogenicity" is scored the same as Uncertain significance.</dd>
+	<dd>This field ranks reclassification priority based on the difference between the CVCS and the CTPS. This field only includes the seven values of ClinVar clinical significance associated with Mendelian diseases (B, B/LB, LB, US/CI, LP, LP/P, P). For the purposes of reclassification, "Conflicting interpretations of pathogenicity" is scored the same as Uncertain significance.</dd>
 </dl>
 
 *	0 - Reclassification unlikely, consistent identity or insufficient information for a recommendation
