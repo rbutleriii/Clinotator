@@ -95,7 +95,7 @@ pandas==0.22.0
   - pytz [required: >=2011k, installed: 2018.3]
 ```
 
-Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versions if possible.
+Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versions if possible. For python 3.4 versions, a pip installation of pandas may give error [#20723](https://github.com/pandas-dev/pandas/issues/20723). If so, specify 'pandas<0.21'.
 
 ### Memory/System requirements
 
@@ -151,7 +151,8 @@ As Clinotator keeps the NCBI xml results in memory, there is a significant memor
 	<dd>This field ranks reclassification priority based on the difference between the CVCS and the CTPS. This field only includes the seven values of ClinVar clinical significance associated with Mendelian diseases (B, B/LB, LB, US/CI, LP, LP/P, P). For the purposes of reclassification, "Conflicting interpretations of pathogenicity" is scored the same as Uncertain significance.</dd>
 </dl>
 
-*	0 - Reclassification unlikely, consistent identity or insufficient information for a recommendation
+*	. - Insufficient information for a recommendation
+*	0 - Reclassification unlikely, consistent identity 
 *	1 - Low priority reclassification, minor change without clinical impact
 *	2 - Medium priority reclassification, minor change of some clinical impact
 *	3 - High priority reclassification, significant change in clinical impact
