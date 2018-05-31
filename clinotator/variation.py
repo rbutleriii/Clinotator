@@ -228,7 +228,7 @@ class VariationClass:
         
         if self.CVNA < 2:
             self.CTPS = None
-            self.CTRR = None
+            self.CTRR = "."
             return
         
         # logging.debug('CTRS score: {}'.format(self.CTRS))
@@ -254,7 +254,7 @@ class VariationClass:
             logging.warning('ClinVar significance for {} does not include B,B/LB'
                          ',LB,US,LP,LP/P,P'.format(self.VID))
             self.CTPS = None
-            self.CTRR = None
+            self.CTRR = "."
             return
         
         self.CTRR = reclassification_tree(ctps_index, cvcs_index)

@@ -94,3 +94,4 @@ ctps_cutoffs = [('Benign', -24),
                 ('Likely pathogenic', 8.4),
                 ('Pathogenic/Likely pathogenic', 15),
                 ('Pathogenic', 10000000)]
+
