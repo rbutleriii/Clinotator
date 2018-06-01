@@ -12,6 +12,7 @@ See main, eventually tests will be added for this module
 import re
 import logging
 import sys
+import datetime
 import pandas as pd
 import global_vars as g
 
@@ -21,7 +22,7 @@ def error_handling():
     return ' {}. {}, line: {}'.format(sys.exc_info()[0], sys.exc_info()[1],
                                       sys.exc_info()[2].tb_lineno)
 
-# generates header for outfile, also counts input header lines
+# generates header for outfile, also counts input info and header lines
 def parse_header(file_object, outprefix):
 
     try:
@@ -42,6 +43,10 @@ def parse_header(file_object, outprefix):
             
             header_count = len(header)
             header[max(info_list) + 1 : max(info_list) + 1] = g.new_headers
+            rundate = datetime.date.today().strftime('%Y-%m-%d')
+            meta_clin_line = ('##annotation=CLINOTATORv{}_run_{}\n'
+                              .format(g.__version__, rundate))
+            header.insert(min(info_list), meta_clin_line)
             outfile.writelines(('{}'.format(item) for item in header))
             file_object.seek(0) # reset read cursor to beginning
             logging.debug('Initial header: {} INFO lines: {} Final header: {}'
@@ -67,12 +72,12 @@ def vcf_prep(file_object, outprefix):
 def cat_info_column(info, rsid, alt, out_tbl):
     rsid_match = rsid.lstrip('rs')
     alt_list = alt.split(",")
-    info_columns = ['VID', 'CVVT', 'CVMA', 'CVCS', 'CVSZ', 'CVNA', 'CVDS',
+    info_columns = ['VID', 'CVVT', 'CVAL', 'CVCS', 'CVSZ', 'CVNA', 'CVDS',
                     'CVLE', 'CTRS', 'CTAA', 'CTPS', 'CTRR']
     logging.debug('rsid: {} alt_list: {}'.format(rsid_match, alt_list))
     # logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
-    info_tbl = out_tbl.loc[(out_tbl['RSID'].astype('str') == rsid_match)
-                           & out_tbl['CVMA'].isin(alt_list)].copy()
+    info_tbl = out_tbl.loc[(out_tbl['rsID'].astype('str') == rsid_match)
+                           & out_tbl['CVAL'].isin(alt_list)].copy()
     
     if len(info_tbl.index) > 0:
         info_tbl.replace({'CVCS': {',': '%2C', ';': '%3B'},

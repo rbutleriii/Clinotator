@@ -137,7 +137,7 @@ def explode(df, lst_cols, fill_value=''):
 
 # outfile generation with vcf option
 def output_files(vcf_tbl, variant_objects, outprefix):
-    columnz = ['VID', 'CVVT', 'RSID', 'CVMA', 'vcfmatch', 'CVCS', 'CVSZ',
+    columnz = ['VID', 'CVVT', 'rsID', 'CVAL', 'vcfmatch', 'CVCS', 'CVSZ',
                'CVNA', 'CVDS', 'CVLE', 'CTRS', 'CTAA', 'CTPS', 'CTRR']
 
     result_tbl = pd.DataFrame([{fn: getattr(variant, fn) for fn in columnz}
@@ -147,7 +147,7 @@ def output_files(vcf_tbl, variant_objects, outprefix):
     result_tbl.sort_values(by='VID', inplace=True)
     logging.debug('result_tbl shape -> {}'.format(result_tbl.shape))
 
-    out_tbl = explode(result_tbl, ['RSID', 'CVMA'], fill_value='.')
+    out_tbl = explode(result_tbl, ['rsID', 'CVAL'], fill_value='.')
     out_tbl.to_csv('{}.tsv'.format(outprefix), sep='\t', na_rep='.',
                    index=False)
     logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
@@ -164,6 +164,8 @@ def output_files(vcf_tbl, variant_objects, outprefix):
 def main():
     args = getargs()
     log_opts(args.log, args.long_log, args.outprefix)
+    logging.info('Run date: {}'
+                 .format(datetime.date.today().strftime('%Y-%m-%d')))
     logging.debug('CLI inputs are {} {} {} {}'
                   .format(args.type, args.email, args.input, args.outprefix))
     Entrez.email = args.email

@@ -33,8 +33,8 @@ new_headers = ['##INFO=<ID=VID,Number=1,Type=Integer,Description="ClinVar var'
                'iation ID">\n',
                '##INFO=<ID=CVVT,Number=A,Type=String,Description="ClinVar var'
                'iant type">\n',
-               '##INFO=<ID=CVMA,Number=A,Type=String,Description="ClinVar min'
-               'or allele">\n',
+               '##INFO=<ID=CVAL,Number=A,Type=String,Description="ClinVar alt'
+               'ernate allele">\n',
                '##INFO=<ID=CVCS,Number=A,Type=String,Description="ClinVar cli'
                'nical significance">\n',
                '##INFO=<ID=CVSZ,Number=A,Type=Integer,Description="ClinVar st'

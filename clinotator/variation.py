@@ -135,8 +135,8 @@ class VariationClass:
             vcf_match.append('{}|{}'.format(RS[index], Alt[index]))
             
         logging.debug('RS list -> {}\nAlt list -> {}'.format(RS, Alt))
-        self.RSID = RS
-        self.CVMA = Alt
+        self.rsID = RS
+        self.CVAL = Alt
         
         if len(vcf_match) > 1:
             self.vcfmatch = vcf_match
@@ -174,7 +174,7 @@ class VariationClass:
                     run_already):
                 logging.warning('{} has multiple observation fields in its recor'
                              'd omitting as an annotation error. Check rsid(s'
-                             ') {} manually'.format(self.VID, self.RSID))
+                             ') {} manually'.format(self.VID, self.rsID))
                 continue
 
             else:

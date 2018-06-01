@@ -124,6 +124,10 @@ As Clinotator keeps the NCBI xml results in memory, there is a significant memor
 	<dd>Conditions reported to be associated with this variant.</dd>
 </dl>
 <dl>
+	<dt>ClinVar Alternate Allele (CVAL)</dt>
+	<dd>The alternate allele connected with ClinVar variation report.</dd>
+</dl>
+<dl>
 	<dt>ClinVar Last Evaluated (CVLE)</dt>
 	<dd>The date the clinical significance of the variation report was last evaluated. Note this is not the date the variation report was last updated, but the date in the <ClinicalAssertionList> field of the ClinVar xml connected to the Review Status.</dd>
 </dl>
