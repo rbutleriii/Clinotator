@@ -10,7 +10,7 @@ Copyright (C) 2017  Robert R Butler III
 See main, eventually tests will be added for this module
 '''
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 
 ### getncbi.py global variables 
@@ -76,15 +76,16 @@ cutoff = {'practice guideline': 1.25,
           'no assertion provided': 0.0}
 
 # dict of assertion weights for scoring
-significance = {'Benign': -6,
-                'Likely benign': -3,
-                'Uncertain significance': -0.3,
-                'Likely pathogenic': 3,
-                'Pathogenic': 6,
-                'drug response': 0, 'association': 0, 'risk factor': 0,
-                'protective': 0, 'Affects': 0,
-                'conflicting data from submitters': 0, 'other': 0,
-                'not provided': 0}
+significance = {'Benign': (-6, 'B'),
+                'Likely benign': (-3, 'LB'),
+                'Uncertain significance': (-0.3, 'US'),
+                'Likely pathogenic': (3, 'LP'),
+                'Pathogenic': (6, 'P'),
+                'drug response': (0, '-'), 'association': (0, '-'),
+                'risk factor': (0, '-'), 'protective': (0, '-'),
+                'Affects': (0, '-'),
+                'conflicting data from submitters': (0, '-'),
+                'other': (0, '-'), 'not provided': (0, '-')}
 
 # list of weighted score upper bounds for ctps bins
 ctps_cutoffs = [('Benign', -24),

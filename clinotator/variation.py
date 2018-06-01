@@ -143,15 +143,6 @@ class VariationClass:
         else:
             self.vcfmatch = '.'
 
-    # parse the PhenotypeList subtree of variation report
-    def pheno_parse(self, observation):
-        pheno_list = []
-        
-        for phenotype in observation.findall('./PhenotypeList/Phenotype'):
-            pheno_list.append(phenotype.get('Name'))
-        
-        self.CVDS = ';'.join(pheno_list)
-
     # parse the ObservationList subtree of variation report
     def observation_parse(self, variationreport):
         run_already = False
@@ -168,22 +159,31 @@ class VariationClass:
                     .find('./ClinicalSignificance/Description').text
                 self.CVLE = observation.find('./ClinicalSignificance') \
                     .get('DateLastEvaluated')
-                self.pheno_parse(observation)
 
             elif (observation.get('VariationID') == self.VID and
                     run_already):
-                logging.warning('{} has multiple observation fields in its recor'
-                             'd omitting as an annotation error. Check rsid(s'
-                             ') {} manually'.format(self.VID, self.rsID))
+                logging.warning('{} has multiple observation fields in its re'
+                             'cord omitting as an annotation error. Check rsi'
+                             'd(s) {} manually'.format(self.VID, self.rsID))
                 continue
 
             else:
                 continue
         
+    # parse the PhenotypeList subtree of variation report
+    def pheno_parse(self, assertion, sig_key):
+        pheno_list = []
+        
+        for phenotype in assertion.findall('./PhenotypeList/Phenotype'):
+            pheno_list.append('{}({})'.format(phenotype.get('Name'), sig_key))
+        
+        return pheno_list
+
     # parse the ClinicalAssertionList subtree of variation report
     def assertion_table_stats(self, variationreport):
         raw_score = []
         age_list = []
+        cvds_list = []
 
         for assertion in variationreport \
                 .findall('./ClinicalAssertionList/GermlineList/Germline'):
@@ -192,8 +192,8 @@ class VariationClass:
             sigval_key = assertion.find('./ClinicalSignificance/Description') \
                 .text
             sig_value = key_test(g.significance, sigval_key)
-                
-            if score > 0 and sig_value != 0:
+
+            if score > 0 and sig_value[0] != 0:
                 try:
                     age = calculate_age(assertion
                                         .find('./ClinicalSignificance')
@@ -205,11 +205,17 @@ class VariationClass:
                     
                 age_list.append(age)
                 D = decimal.Decimal
-                raw_score.append(float(D(str(score)) * D(str(sig_value))
+                raw_score.append(float(D(str(score)) * D(str(sig_value[0]))
                                  * D(str(age_weight(age)))))
                 logging.debug('score: {} sig_value: {} age_weight: {} age: {}'
-                              .format(score, sig_value, age_weight(age), age))
+                              .format(score, sig_value[0], age_weight(age), age))
 
+                cvds_list += self.pheno_parse(assertion, sig_value[1])
+            
+        self.CVDS = ';'.join(cvds_list)
+        if not self.CVDS:
+            self.CVDS = '.'
+        
         self.CVNA = len(age_list)
         self.CTAA = average_list_age(self.VID, age_list)
         # logging.debug('VID: {} -> age list size: {}, raw_score size: {}'
@@ -228,7 +234,7 @@ class VariationClass:
         
         if self.CVNA < 2:
             self.CTPS = None
-            self.CTRR = "."
+            self.CTRR = '.'
             return
         
         # logging.debug('CTRS score: {}'.format(self.CTRS))
@@ -254,7 +260,7 @@ class VariationClass:
             logging.warning('ClinVar significance for {} does not include B,B/LB'
                          ',LB,US,LP,LP/P,P'.format(self.VID))
             self.CTPS = None
-            self.CTRR = "."
+            self.CTRR = '.'
             return
         
         self.CTRR = reclassification_tree(ctps_index, cvcs_index)
