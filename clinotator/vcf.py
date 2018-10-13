@@ -31,7 +31,7 @@ def parse_header(file_object, outprefix):
             info_list = []
             for index, line in enumerate(
                     next(file_object) for x in range(g.max_vcf_header_size)):
-                m = re.match('##(\w+)=', line)
+                m = re.match('##([\w-]+)=', line)
                 
                 if m and m.group(1) == 'INFO':
                     header.append(line)
