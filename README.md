@@ -99,7 +99,7 @@ pandas==0.22.0
   - pytz [required: >=2011k, installed: 2018.3]
 ```
 
-Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versions if possible. For python 3.4 versions, a pip installation of pandas may give error [#20723](https://github.com/pandas-dev/pandas/issues/20723). If so, specify 'pandas<0.21'. As or December 2018, the batch query limits appear to have tightened upgrade to biopython 1.73 see issue [#1867](https://github.com/biopython/biopython/issues/1867).
+Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versions if possible. For python 3.4 versions, a pip installation of pandas may give error [#20723](https://github.com/pandas-dev/pandas/issues/20723). If so, specify 'pandas<0.21'. As of December 2018, the NCBI batch query limits appear to have tightened. Upgrade to biopython 1.73 see issue [#1867](https://github.com/biopython/biopython/issues/1867).
 
 ### Memory/System requirements
 
