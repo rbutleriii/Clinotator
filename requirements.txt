@@ -1,2 +1,2 @@
 pandas
-biopython
+biopython>=1.73

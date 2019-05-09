@@ -1,0 +1,8 @@
+VID	CVVT	rsID	CVAL	vcfmatch	CVCS	CVSZ	CVNA	CVDS	CVLE	CTRS	CTAA	CTPS	CTRR
+7	Haplotype	200401432	A	['200401432|A', '118161496|C']	Pathogenic	1	1	Mitochondrial complex I deficiency(P)	2017-09-01	.	1.0	.	.
+7	Haplotype	118161496	C	['200401432|A', '118161496|C']	Pathogenic	1	1	Mitochondrial complex I deficiency(P)	2017-09-01	.	1.0	.	.
+13979	Simple	180177040	C	.	Pathogenic	3	7	Cardio-facio-cutaneous syndrome(P);Cardio-facio-cutaneous syndrome(P);Inborn genetic diseases(P);Cardiofaciocutaneous syndrome 1(P);not provided(P);Cardio-facio-cutaneous syndrome(P);Rasopathy(P)	2017-04-03	37.74	2.0	Pathogenic	0
+50317	Simple	118161496	C	.	Conflicting interpretations of pathogenicity	1	5	not provided(P);Inborn genetic diseases(P);not provided(US);not provided(US);Mitochondrial complex I deficiency(LP)	2017-08-14	12.36	2.2	Pathogenic/Likely pathogenic	3
+55794	Simple	180177040	G	.	Likely pathogenic	0	0	.	2016-05-31	.	.	.	.
+211895	Simple	766877230	T	.	Uncertain significance	2	2	not specified(US);not specified(US)	2016-11-02	-0.48	3.0	Uncertain significance	0
+262232	Simple	34376836	A	.	Benign	2	2	Brown-Vialetto-Van Laere syndrome 1(B);not specified(B)	2017-11-08	-12.0	1.0	Benign/Likely benign	1
