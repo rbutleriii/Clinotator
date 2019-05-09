@@ -29,8 +29,7 @@ def parse_header(file_object, outprefix):
         with open('{}.anno.vcf'.format(outprefix), 'w') as outfile:
             header = []
             info_list = []
-            for index, line in enumerate(
-                    next(file_object) for x in range(g.max_vcf_header_size)):
+            for index, line in zip(range(g.max_vcf_header_size), file_object):
                 m = re.match('##([\w\-\.]+)=', line)
                 
                 if m and m.group(1) == 'INFO':
@@ -63,7 +62,8 @@ def parse_header(file_object, outprefix):
 # process input vcf file, return rsids for query and vcf_tbl for output
 def vcf_prep(file_object, outprefix):
     header_count = parse_header(file_object, outprefix)
-    vcf_tbl = pd.read_table(file_object, skiprows=header_count, dtype=str)
+    vcf_tbl = pd.read_csv(file_object, sep='\t', skiprows=header_count,
+                          dtype=str)
     logging.debug('vcf_tbl shape -> {}'.format(vcf_tbl.shape))
     vcf_list = vcf_tbl.ID.values[vcf_tbl.ID.values != '.'].tolist()
     return vcf_list, vcf_tbl
@@ -84,7 +84,7 @@ def cat_info_column(info, rsid, alt, out_tbl):
                           'CVDS': {',': '%2C', ';': '%3B'}},
                          regex=True, inplace=True)
         new_info = ['{}={}'.format(x, info_tbl[x]
-                    .to_csv(header=None, index=False, na_rep='.')
+                    .to_csv(header=False, index=False, na_rep='.')
                     .strip('\n')) for x in info_columns]
         new_info = [string.replace('\n', ',') for string in new_info]
         logging.debug('{} had a match: {}'.format(rsid, new_info))
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     with open('../test/test.vcf', 'r') as file_object:
         vcf_list, vcf_tbl = vcf_prep(file_object, 'test_header')
         logging.debug('vcf_list -> {}'.format(vcf_list))
-        sample_tbl = pd.read_table('../test/test.tbl', dtype=str)
+        sample_tbl = pd.read_csv('../test/test.tbl', sep='\t', dtype=str)
         info_list = cat_info_column('NS=3;DP=11;AF=0.017', 'rs34376836', 'A',
                                     sample_tbl)
         info_list = cat_info_column('NS=3;DP=11;AF=0.017', '.', 'A',
