@@ -58,7 +58,7 @@ While ClinVar has become an indispensable resource for clinical variant interpre
 
 ## Installation
 
-Implemented in python (tested on 2.7.12 and >=3.4). You can `git clone` or download the zipfile and unpack. Add the folder location to your ~/.bash_profile or:
+Implemented in python (tested on 2.7.15 and >=3.5). You can `git clone` or download the zipfile and unpack. Add the folder location to your ~/.bash_profile or:
 
 ```
 export PATH=$PATH:path/to/folder/Clinotator/clinotator
@@ -93,17 +93,17 @@ The following dependencies:
 biopython==1.73
   - numpy [required: Any, installed: 1.14.0]
 pandas==0.22.0
-  - numpy [required: >=1.9.0, installed: 1.14.0]
+  - numpy [required: >=1.14.0, installed: 1.14.0]
   - python-dateutil [required: >=2, installed: 2.6.1]
     - six [required: >=1.5, installed: 1.11.0]
   - pytz [required: >=2011k, installed: 2018.3]
 ```
 
-Numpy *should* work >= 1.9.0 and pandas >= 0.20.0, but install more recent versions if possible. For python 3.4 versions, a pip installation of pandas may give error [#20723](https://github.com/pandas-dev/pandas/issues/20723). If so, specify 'pandas<0.21'. As of December 2018, the NCBI batch query limits appear to have tightened. Upgrade to biopython 1.73 see issue [#1867](https://github.com/biopython/biopython/issues/1867).
+Numpy *should* work >= 1.14.0 and pandas >= 0.22.0, but install more recent versions if possible. As of December 2018, the NCBI batch query limits appear to have tightened. Upgrade to biopython 1.73 see issue [#1867](https://github.com/biopython/biopython/issues/1867).
 
 ### Memory/System requirements
 
-Clinotator was designed in a Linux environment and implemented in Python (2.7 or >=3.4), and can run in similar OSX and possibly Windows Python environments. It can be run on a personal computer with relatively modest system requirements; a minimum of 2GB available RAM.  
+Clinotator was designed in a Linux environment and implemented in Python (2.7 or >=3.5), and can run in similar OSX and possibly Windows Python environments. It can be run on a personal computer with relatively modest system requirements; a minimum of 2GB available RAM.  
 
 As Clinotator keeps the NCBI xml results in memory, there is a significant memory usage. At the time of writing, the entire ClinVar xml set is approaching 6GB. Loading the entire set into memory is doable with at least 8GB of memory, though it is recommended that you batch your queries in this rare case. More typical usage for subsets of ClinVar or batch vcf annotations should not pose a memory issue.
 
