@@ -1,0 +1,15 @@
+language: python
+python:
+  - "2.7"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+# command to run tests
+script:
+  - clinotator/clinotator.py -t vid -e A.N.other@example.com test/test.vid
+  - clinotator/clinotator.py -t rsid -e A.N.other@example.com test/test.rsid
+  - clinotator/clinotator.py -t vcf -e A.N.other@example.com test/test.vcf
+
