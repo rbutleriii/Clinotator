@@ -186,7 +186,7 @@ def main():
                       .format(len(variant_objects)))
         
         output_files(vcf_tbl, variant_objects, outprefix)
-        logging.debug('file written to {}.tsv'.format(outprefix))
+        logging.info('file written to {}.tsv'.format(outprefix))
     sys.exit()
 
 if __name__ == '__main__':
