@@ -10,7 +10,7 @@ Copyright (C) 2017  Robert R Butler III
 See main, eventually tests will be added for this module
 '''
 
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 
 
 ### getncbi.py global variables 
@@ -26,7 +26,7 @@ etool = 'Clinotator'
 ### vcf.py global variables 
 
 # limit for the vaf header lines to search. They are usually <100, 200 is safe
-max_vcf_header_size = 200
+max_vcf_header_size = 500
 
 # header INFO fields to be inserted into the output vcf
 new_headers = ['##INFO=<ID=VID,Number=1,Type=Integer,Description="ClinVar var'

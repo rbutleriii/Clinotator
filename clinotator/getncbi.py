@@ -105,10 +105,12 @@ def batch_ncbi(query_type, query_results, id_list, **kwargs):
 # this is then the only way to epost -> elink,egquery,etc.
 def batch_local(file_type, query_type, id_list, **kwargs):
     count = len(id_list)
+    logging.debug('total rsIDs to post: {}'.format(count))
     result_list = []
 
     for start in range(0, count, g.elink_batch):
         end = min(count, start + g.elink_batch)
+        time.sleep(0.37)
         logging.info("Looking up VIDs for rsIDs {} to {}"
                      .format(start + 1, end))
         webenv1, query_key1 = post_ncbi(
@@ -120,8 +122,14 @@ def batch_local(file_type, query_type, id_list, **kwargs):
                 webenv=webenv1, query_key=query_key1, **kwargs))
         record = Entrez.read(fetch_handle)
         fetch_handle.close()
-        result_list.extend(
-                [link['Id'] for link in record[0]['LinkSetDb'][0]['Link']])
+        try:
+            result_list.extend(
+                    [link['Id'] for link in record[0]['LinkSetDb'][0]['Link']])
+        except IndexError:
+            logging.info('No VIDs for rsIDs {} to {}'.format(start + 1, end))
+            pass
+        continue
+        logging.debug('length result list: {}'.format(len(result_list)))
     return result_list
 
 # getting xml variation files for query_results list, 
