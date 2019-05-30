@@ -72,6 +72,7 @@ def vcf_prep(file_object, outprefix):
 def cat_info_column(info, rsid, alt, out_tbl):
     rsid_match = rsid.lstrip('rs')
     alt_list = alt.split(",")
+    info_tbl = pd.DataFrame()
     info_columns = ['VID', 'CVVT', 'CVAL', 'CVCS', 'CVSZ', 'CVNA', 'CVDS',
                     'CVLE', 'CTRS', 'CTAA', 'CTPS', 'CTRR']
     logging.debug('rsid: {} alt_list: {}'.format(rsid_match, alt_list))
