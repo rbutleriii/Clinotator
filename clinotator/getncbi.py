@@ -110,7 +110,6 @@ def batch_local(file_type, query_type, id_list, **kwargs):
 
     for start in range(0, count, g.elink_batch):
         end = min(count, start + g.elink_batch)
-        time.sleep(0.37)
         logging.info("Looking up VIDs for rsIDs {} to {}"
                      .format(start + 1, end))
         webenv1, query_key1 = post_ncbi(
@@ -130,6 +129,7 @@ def batch_local(file_type, query_type, id_list, **kwargs):
             pass
         continue
         logging.debug('length result list: {}'.format(len(result_list)))
+        time.sleep(0.37)
     return result_list
 
 # getting xml variation files for query_results list, 
