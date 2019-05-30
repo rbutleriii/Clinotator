@@ -72,12 +72,14 @@ def vcf_prep(file_object, outprefix):
 def cat_info_column(info, rsid, alt, out_tbl):
     rsid_match = rsid.lstrip('rs')
     alt_list = alt.split(",")
+    info_tbl = pd.DataFrame()
     info_columns = ['VID', 'CVVT', 'CVAL', 'CVCS', 'CVSZ', 'CVNA', 'CVDS',
                     'CVLE', 'CTRS', 'CTAA', 'CTPS', 'CTRR']
     logging.debug('rsid: {} alt_list: {}'.format(rsid_match, alt_list))
     # logging.debug('out_tbl shape -> {}'.format(out_tbl.shape))
-    info_tbl = out_tbl.loc[(out_tbl['rsID'].astype('str') == rsid_match)
-                           & out_tbl['CVAL'].isin(alt_list)].copy()
+    if rsid_match != ".":
+        info_tbl = out_tbl.loc[(out_tbl['rsID'].astype('str') == rsid_match)
+                               & out_tbl['CVAL'].isin(alt_list)].copy()
     
     if len(info_tbl.index) > 0:
         info_tbl.replace({'CVCS': {',': '%2C', ';': '%3B'},

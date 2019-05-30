@@ -10,7 +10,7 @@ Copyright (C) 2017  Robert R Butler III
 See main, eventually tests will be added for this module
 '''
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 
 ### getncbi.py global variables 
