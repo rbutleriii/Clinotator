@@ -3,7 +3,7 @@
 
 # Clinotator
 ## Synopsis
-
+## Note: Clinotator is currently down, as the ClinVar data at NCBI has changed format. Currently working on a fix.
 ### Clinical interpretation of ambiguous ClinVar annotations
 
 This project takes variants as input and queries NCBI eutilities to generate ClinVar Variation Report<sup>1</sup> scoring metrics. The overall goal is to generate annotations of use for given batches of variants to inform clinical interpretation. The metrics include:
