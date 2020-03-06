@@ -70,6 +70,7 @@ def key_test(test_dict, test_key):
         return test_dict[test_key]
     except KeyError:
         logging.warning('{} is not an expected key'.format(test_key))
+        raise KeyError
 
 # evaluates reclassification recommendation for CTRR
 def reclassification_tree(ctps_index, cvcs_index):    
@@ -198,7 +199,11 @@ class VariationClass:
                 score = key_test(g.cutoff, revstat_key)
                 sigval_key = assertion.find('./Interpretation/Description') \
                     .text
-                sig_value = key_test(g.significance, sigval_key)
+                try:
+                    sig_value = key_test(g.significance, sigval_key)
+                except:
+                    logging.warn('Assertion {} for VID {} is incorrectly formatted'.format(assertion.attrib['ID'], self.VID))
+                    continue
     
                 if score > 0 and sig_value[0] != 0:
                     try:
