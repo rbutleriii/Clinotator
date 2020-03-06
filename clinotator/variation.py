@@ -173,9 +173,13 @@ class VariationClass:
     def pheno_parse(self, assertion, sig_key):
         pheno_list = []
         
-        for phenotype in assertion.findall('./PhenotypeList/Phenotype'):
-            pheno_list.append('{}({})'.format(phenotype.get('Name'), sig_key))
+        for phenotype in assertion.findall('./TraitSet/Trait/XRef'):
+            d_name = ':'.join([phenotype.attrib['DB'], phenotype.attrib['ID']])
+            pheno_list.append('{}({})'.format(d_name, sig_key))
         
+        if not pheno_list:
+            pheno_list.append('{}({})'.format("Not_Provided", sig_key))
+        logging.debug('Disease list for {}: {}'.format(assertion.attrib['ID'], pheno_list))
         return pheno_list
 
     # parse the ClinicalAssertionList subtree of variation report
@@ -183,34 +187,40 @@ class VariationClass:
         raw_score = []
         age_list = []
         cvds_list = []
+        
+        for assertion in variationreport.findall('./InterpretedRecord/ClinicalAssertionList/ClinicalAssertion'):
+            observ_list = []
+            [observ_list.append(x.text) for x in assertion.findall('./ObservedInList/ObservedIn/Sample/Origin')]
+            logging.debug('Origin List for {}: {}'.format(assertion.attrib['ID'], observ_list))
+            try:
+                assert "germline" in observ_list
+                revstat_key = assertion.find('ReviewStatus').text
+                score = key_test(g.cutoff, revstat_key)
+                sigval_key = assertion.find('./Interpretation/Description') \
+                    .text
+                sig_value = key_test(g.significance, sigval_key)
+    
+                if score > 0 and sig_value[0] != 0:
+                    try:
+                        age = calculate_age(assertion.find('./Interpretation')
+                                            .get('DateLastEvaluated'))
+                    except:
+                        logging.warning('{} has a missing assertion date!'
+                                     .format(self.VID))
+                        continue
+                        
+                    age_list.append(age)
+                    D = decimal.Decimal
+                    raw_score.append(float(D(str(score)) * D(str(sig_value[0]))
+                                     * D(str(age_weight(age)))))
+                    logging.debug('score: {} sig_value: {} age_weight: {} age: {}'
+                                  .format(score, sig_value[0], age_weight(age), age))
+    
+                    cvds_list += self.pheno_parse(assertion, sig_value[1])
+            except AssertionError as a:
+                logging.debug('no germline reports for assertion {}, skipping'.format(assertion.attrib['ID']))
+                continue
 
-        for assertion in variationreport \
-                .findall('./ClinicalAssertionList/GermlineList/Germline'):
-            revstat_key = assertion.find('ReviewStatus').text
-            score = key_test(g.cutoff, revstat_key)
-            sigval_key = assertion.find('./ClinicalSignificance/Description') \
-                .text
-            sig_value = key_test(g.significance, sigval_key)
-
-            if score > 0 and sig_value[0] != 0:
-                try:
-                    age = calculate_age(assertion
-                                        .find('./ClinicalSignificance')
-                                        .get('DateLastEvaluated'))
-                except:
-                    logging.warning('{} has a missing assertion date!'
-                                 .format(self.VID))
-                    continue
-                    
-                age_list.append(age)
-                D = decimal.Decimal
-                raw_score.append(float(D(str(score)) * D(str(sig_value[0]))
-                                 * D(str(age_weight(age)))))
-                logging.debug('score: {} sig_value: {} age_weight: {} age: {}'
-                              .format(score, sig_value[0], age_weight(age), age))
-
-                cvds_list += self.pheno_parse(assertion, sig_value[1])
-            
         self.CVDS = ';'.join(cvds_list)
         if not self.CVDS:
             self.CVDS = '.'
