@@ -70,6 +70,7 @@ def key_test(test_dict, test_key):
         return test_dict[test_key]
     except KeyError:
         logging.warning('{} is not an expected key'.format(test_key))
+        raise KeyError
 
 # evaluates reclassification recommendation for CTRR
 def reclassification_tree(ctps_index, cvcs_index):    
@@ -106,6 +107,8 @@ class VariationClass:
     def __init__(self, variationreport):
         self.VID = variationreport.attrib['VariationID']
         self.CVVT = variationreport.attrib['VariationType']
+        reviewstat = variationreport.find('.InterpretedRecord/ReviewStatus').text
+        self.CVSZ = g.star_dict[reviewstat]
         self.allele_parse(variationreport)
         self.observation_parse(variationreport)
         self.assertion_table_stats(variationreport)
@@ -117,7 +120,7 @@ class VariationClass:
         Alt = []
         vcf_match = []
         
-        for index, alleles in enumerate(variationreport.findall('./Allele')):
+        for index, alleles in enumerate(variationreport.findall('.InterpretedRecord/SimpleAllele')):
             
             try:
                 RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]')
@@ -127,8 +130,8 @@ class VariationClass:
             
             try:
                 Alt.append(alleles
-                           .find('./SequenceLocation[@Assembly="GRCh38"]')
-                           .get('alternateAllele'))
+                           .find('./Location/SequenceLocation[@Assembly="GRCh38"]')
+                           .get('alternateAlleleVCF'))
             except:
                 Alt.append('.')
                 
@@ -147,22 +150,19 @@ class VariationClass:
     def observation_parse(self, variationreport):
         run_already = False
 
-        for observation in variationreport \
-                .findall('./ObservationList/Observation'):
+        for interpretation in variationreport \
+                .findall('./InterpretedRecord/Interpretations/Interpretation'):
             
-            if (observation.get('VariationID') == self.VID and
+            if (interpretation.get('Type') == "Clinical significance" and
                     not run_already):
                 run_already = True
-                reviewstat = observation.find('ReviewStatus').text
-                self.CVSZ = g.star_dict[reviewstat]
-                self.CVCS = observation \
-                    .find('./ClinicalSignificance/Description').text
-                self.CVLE = observation.find('./ClinicalSignificance') \
-                    .get('DateLastEvaluated')
+                self.CVCS = interpretation \
+                    .find('./Description').text
+                self.CVLE = interpretation.attrib['DateLastEvaluated']
 
-            elif (observation.get('VariationID') == self.VID and
+            elif (interpretation.get('VariationID') == self.VID and
                     run_already):
-                logging.warning('{} has multiple observation fields in its re'
+                logging.warning('{} has multiple interpretation fields in its re'
                              'cord omitting as an annotation error. Check rsi'
                              'd(s) {} manually'.format(self.VID, self.rsID))
                 continue
@@ -174,9 +174,13 @@ class VariationClass:
     def pheno_parse(self, assertion, sig_key):
         pheno_list = []
         
-        for phenotype in assertion.findall('./PhenotypeList/Phenotype'):
-            pheno_list.append('{}({})'.format(phenotype.get('Name'), sig_key))
+        for phenotype in assertion.findall('./TraitSet/Trait/XRef'):
+            d_name = ':'.join([phenotype.attrib['DB'], phenotype.attrib['ID']])
+            pheno_list.append('{}({})'.format(d_name, sig_key))
         
+        if not pheno_list:
+            pheno_list.append('{}({})'.format("Not_Provided", sig_key))
+        logging.debug('Disease list for {}: {}'.format(assertion.attrib['ID'], pheno_list))
         return pheno_list
 
     # parse the ClinicalAssertionList subtree of variation report
@@ -184,34 +188,44 @@ class VariationClass:
         raw_score = []
         age_list = []
         cvds_list = []
-
-        for assertion in variationreport \
-                .findall('./ClinicalAssertionList/GermlineList/Germline'):
-            revstat_key = assertion.find('ReviewStatus').text
-            score = key_test(g.cutoff, revstat_key)
-            sigval_key = assertion.find('./ClinicalSignificance/Description') \
-                .text
-            sig_value = key_test(g.significance, sigval_key)
-
-            if score > 0 and sig_value[0] != 0:
+        
+        for assertion in variationreport.findall('./InterpretedRecord/ClinicalAssertionList/ClinicalAssertion'):
+            observ_list = []
+            [observ_list.append(x.text) for x in assertion.findall('./ObservedInList/ObservedIn/Sample/Origin')]
+            logging.debug('Origin List for {}: {}'.format(assertion.attrib['ID'], observ_list))
+            try:
+                assert "germline" in observ_list
+                revstat_key = assertion.find('ReviewStatus').text
+                score = key_test(g.cutoff, revstat_key)
+                sigval_key = assertion.find('./Interpretation/Description') \
+                    .text
                 try:
-                    age = calculate_age(assertion
-                                        .find('./ClinicalSignificance')
-                                        .get('DateLastEvaluated'))
+                    sig_value = key_test(g.significance, sigval_key)
                 except:
-                    logging.warning('{} has a missing assertion date!'
-                                 .format(self.VID))
+                    logging.warn('Assertion {} for VID {} is incorrectly formatted'.format(assertion.attrib['ID'], self.VID))
                     continue
-                    
-                age_list.append(age)
-                D = decimal.Decimal
-                raw_score.append(float(D(str(score)) * D(str(sig_value[0]))
-                                 * D(str(age_weight(age)))))
-                logging.debug('score: {} sig_value: {} age_weight: {} age: {}'
-                              .format(score, sig_value[0], age_weight(age), age))
+    
+                if score > 0 and sig_value[0] != 0:
+                    try:
+                        age = calculate_age(assertion.find('./Interpretation')
+                                            .get('DateLastEvaluated'))
+                    except:
+                        logging.warning('{} has a missing assertion date!'
+                                     .format(self.VID))
+                        continue
+                        
+                    age_list.append(age)
+                    D = decimal.Decimal
+                    raw_score.append(float(D(str(score)) * D(str(sig_value[0]))
+                                     * D(str(age_weight(age)))))
+                    logging.debug('score: {} sig_value: {} age_weight: {} age: {}'
+                                  .format(score, sig_value[0], age_weight(age), age))
+    
+                    cvds_list += self.pheno_parse(assertion, sig_value[1])
+            except AssertionError as a:
+                logging.debug('no germline reports for assertion {}, skipping'.format(assertion.attrib['ID']))
+                continue
 
-                cvds_list += self.pheno_parse(assertion, sig_value[1])
-            
         self.CVDS = ';'.join(cvds_list)
         if not self.CVDS:
             self.CVDS = '.'
@@ -269,7 +283,7 @@ class VariationClass:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     logging.debug('this is a module test')
-    tree = ET.parse('../test/sample.xml')
+    tree = ET.parse('../test/sample2.xml')
     clinvarresult = tree.getroot()
     for var_index, variationreport in enumerate(clinvarresult):
         variant = VariationClass(variationreport)

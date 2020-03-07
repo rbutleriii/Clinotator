@@ -152,8 +152,8 @@ def get_ncbi_xml(file_type, id_list, query_results):
     webenv1, query_key1 = post_ncbi(file_type, 'epost', db='clinvar',
                                     id=",".join(vid_list))
     batch_ncbi('efetch', staging_list, vid_list, db='clinvar',
-               rettype='variation', retmax=g.efetch_batch, webenv=webenv1,
-               query_key=query_key1)
+               rettype='vcv', is_variationid='true', retmax=g.efetch_batch,
+               webenv=webenv1, query_key=query_key1)
     [query_results.append(batch) for batch in staging_list] 
     stop = timing_tool()
     logging.info('Download time: {} min, Batches run -> {}'
