@@ -10,7 +10,7 @@ Copyright (C) 2017  Robert R Butler III
 See main, eventually tests will be added for this module
 '''
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 
 ### getncbi.py global variables 
@@ -79,6 +79,7 @@ cutoff = {'practice guideline': 1.25,
 significance = {'Benign': (-6, 'B'),
                 'Likely benign': (-3, 'LB'),
                 'Uncertain significance': (-0.3, 'US'),
+                'Uncertain Significance': (-0.3, 'US'),
                 'Likely pathogenic': (3, 'LP'),
                 'Pathogenic': (6, 'P'),
                 'drug response': (0, '-'), 'association': (0, '-'),

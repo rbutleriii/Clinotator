@@ -1,8 +1,10 @@
 VID	CVVT	rsID	CVAL	vcfmatch	CVCS	CVSZ	CVNA	CVDS	CVLE	CTRS	CTAA	CTPS	CTRR
-7	Haplotype	200401432	A	['200401432|A', '118161496|C']	Pathogenic	1	1	Mitochondrial complex I deficiency(P)	2017-09-01	.	1.0	.	.
-7	Haplotype	118161496	C	['200401432|A', '118161496|C']	Pathogenic	1	1	Mitochondrial complex I deficiency(P)	2017-09-01	.	1.0	.	.
-13979	Simple	180177040	C	.	Pathogenic	3	7	Cardio-facio-cutaneous syndrome(P);Cardio-facio-cutaneous syndrome(P);Inborn genetic diseases(P);Cardiofaciocutaneous syndrome 1(P);not provided(P);Cardio-facio-cutaneous syndrome(P);Rasopathy(P)	2017-04-03	37.74	2.0	Pathogenic	0
-50317	Simple	118161496	C	.	Conflicting interpretations of pathogenicity	1	5	not provided(P);Inborn genetic diseases(P);not provided(US);not provided(US);Mitochondrial complex I deficiency(LP)	2017-08-14	12.36	2.2	Pathogenic/Likely pathogenic	3
-55794	Simple	180177040	G	.	Likely pathogenic	0	0	.	2016-05-31	.	.	.	.
-211895	Simple	766877230	T	.	Uncertain significance	2	2	not specified(US);not specified(US)	2016-11-02	-0.48	3.0	Uncertain significance	0
-262232	Simple	34376836	A	.	Benign	2	2	Brown-Vialetto-Van Laere syndrome 1(B);not specified(B)	2017-11-08	-12.0	1.0	Benign/Likely benign	1
+7	Haplotype	118161496	C	['118161496|C', '200401432|A']	Pathogenic	1	1	OMIM:252010(P)	2017-09-01	.	2.0	.	.
+7	Haplotype	200401432	A	['118161496|C', '200401432|A']	Pathogenic	1	1	OMIM:252010(P)	2017-09-01	.	2.0	.	.
+9	single nucleotide variant	1800562	A	.	Conflicting interpretations of pathogenicity, other	1	13	OMIM:235200(P);Not_Provided(P);MedGen:C0392514(P);Orphanet:ORPHA79230(P);MedGen:C0392514(P);MedGen:C0027672(P);HP:HP:0000992(US);HP:HP:0010473(US);OMIM:235200(P);OMIM:235200(P);OMIM:235200(P);OMIM:235200(LP);OMIM:235200(P);OMIM:235200(P)	2019-05-28	58.02	2.5384615384615383	Pathogenic	3
+11	single nucleotide variant	1800730	T	.	Uncertain significance	2	4	OMIM:104300(US);OMIM:176100(US);OMIM:176200(US);OMIM:235200(US);OMIM:612635(US);OMIM:614193(US);MedGen:C0392514(US);OMIM:235200(US);MedGen:CN517202(US)	2018-12-15	-1.17	1.25	Uncertain significance	0
+14125	single nucleotide variant	267606908	C	.	Pathogenic	3	10	MedGen:CN230736(P);OMIM:160500(P);OMIM:181430(P);OMIM:192600(P);OMIM:255160(P);OMIM:255310(P);OMIM:608358(P);OMIM:613426(P);Not_Provided(P);Orphanet:ORPHA217569(P);OMIM:192600(P);MedGen:C0949658(P);Not_Provided(P);Orphanet:ORPHA217569(P);MedGen:C0949658(P);MedGen:C0007194(P)	2016-12-15	56.28	1.7	Pathogenic	0
+50317	single nucleotide variant	118161496	C	.	Conflicting interpretations of pathogenicity	1	5	Not_Provided(US);Not_Provided(P);MeSH:D030342(P);OMIM:252010(LP);MedGen:CN517202(US)	2017-08-14	11.22	3.0	Pathogenic/Likely pathogenic	3
+127994	Microsatellite	587780147	TGAGATAA	.	Pathogenic	2	2	MedGen:C0027672(P);MeSH:D009386(P);MedGen:C0027672(P)	2016-06-10	7.8	4.5	Likely pathogenic	2
+214885	single nucleotide variant	200401432	A	.	Uncertain significance	2	2	MeSH:D030342(US);Not_Provided(US)	2017-12-29	-0.54	2.0	Uncertain significance	0
+230850	Microsatellite	587780147	T	.	Pathogenic	2	2	MedGen:C0027672(P);MedGen:C0027672(P)	2018-10-15	11.4	1.5	Pathogenic/Likely pathogenic	1

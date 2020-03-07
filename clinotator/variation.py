@@ -114,13 +114,21 @@ class VariationClass:
         self.assertion_table_stats(variationreport)
         self.analysis_stats()
 
+    # deal with Haplotypes
+    def haplos(self, variationreport):
+        if self.CVVT == "Haplotype":
+            all_term = '.InterpretedRecord/Haplotype/SimpleAllele'
+        else:
+            all_term = '.InterpretedRecord/SimpleAllele'
+        return all_term
+
     # parse the Allele subtree of variation report
     def allele_parse(self, variationreport):
         RS = []
         Alt = []
         vcf_match = []
         
-        for index, alleles in enumerate(variationreport.findall('.InterpretedRecord/SimpleAllele')):
+        for index, alleles in enumerate(variationreport.findall(self.haplos(variationreport))):
             
             try:
                 RS.append(alleles.find('./XRefList/XRef[@DB="dbSNP"]')
@@ -190,11 +198,12 @@ class VariationClass:
         cvds_list = []
         
         for assertion in variationreport.findall('./InterpretedRecord/ClinicalAssertionList/ClinicalAssertion'):
-            observ_list = []
-            [observ_list.append(x.text) for x in assertion.findall('./ObservedInList/ObservedIn/Sample/Origin')]
+            observ_set = {"germline", "de novo", "maternal", "paternal",
+                          "inherited", "unknown", "uniparental", "biparental"}
+            observ_list = {x.text.lower() for x in assertion.findall('./ObservedInList/ObservedIn/Sample/Origin')}
             logging.debug('Origin List for {}: {}'.format(assertion.attrib['ID'], observ_list))
             try:
-                assert "germline" in observ_list
+                assert len(observ_set.intersection(observ_list)) > 0
                 revstat_key = assertion.find('ReviewStatus').text
                 score = key_test(g.cutoff, revstat_key)
                 sigval_key = assertion.find('./Interpretation/Description') \
