@@ -82,8 +82,10 @@ def cat_info_column(info, rsid, alt, out_tbl):
                                & out_tbl['CVAL'].isin(alt_list)].copy()
     
     if len(info_tbl.index) > 0:
-        info_tbl.replace({'CVCS': {',': '%2C', ';': '%3B'},
-                          'CVDS': {',': '%2C', ';': '%3B'}},
+        info_tbl.replace({'CVCS': {',': '%2C', ';': '%3B', ' ': '_'},
+                          'CVDS': {',': '%2C', ';': '%3B'},
+                          'CVVT': {' ': '_'},
+                          'CTPS': {' ': '_'}},
                          regex=True, inplace=True)
         new_info = ['{}={}'.format(x, info_tbl[x]
                     .to_csv(header=False, index=False, na_rep='.')

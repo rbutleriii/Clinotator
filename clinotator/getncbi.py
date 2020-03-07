@@ -46,6 +46,11 @@ def http_attempts(query_type, **kwargs):
                 logging.warning(err)
                 sys.tracebacklimit = None
                 time.sleep(15)
+            elif err.code == 429:
+                logging.info("Attempt {} of 4".format(attempt + 1))
+                logging.warning(err)
+                sys.tracebacklimit = None
+                time.sleep(15)
             else:
                 raise
         else:
@@ -78,6 +83,7 @@ def post_ncbi(file_type, query_type, **kwargs):
 def batch_ncbi(query_type, query_results, id_list, **kwargs):
     count = len(id_list)
 
+    time.sleep(0.35)
     for start in range(0, count, g.efetch_batch):
         end = min(count, start + g.efetch_batch)
         logging.info("Going to download record {} to {}"
@@ -129,7 +135,7 @@ def batch_local(file_type, query_type, id_list, **kwargs):
             pass
         continue
         logging.debug('length result list: {}'.format(len(result_list)))
-        time.sleep(0.37)
+        time.sleep(0.35)
     return result_list
 
 # getting xml variation files for query_results list, 
