@@ -91,16 +91,16 @@ The warnings, as well as some additional information can be stored in the log fi
 The following dependencies:
 
 ```
-biopython==1.73
-  - numpy [required: Any, installed: 1.14.0]
-pandas==0.22.0
-  - numpy [required: >=1.14.0, installed: 1.14.0]
+biopython>=1.74
+  - numpy [required: Any, installed: 1.16.4]
+pandas>=0.24.2
+  - numpy [required: >=1.14.0, installed: 1.16.4]
   - python-dateutil [required: >=2, installed: 2.6.1]
-    - six [required: >=1.5, installed: 1.11.0]
-  - pytz [required: >=2011k, installed: 2018.3]
+    - six [required: >=1.5, installed: 1.12.0]
+  - pytz [required: >=2011k, installed: 2019.1]
 ```
 
-Numpy *should* work >= 1.14.0 and pandas >= 0.22.0, but install more recent versions if possible. As of December 2018, the NCBI batch query limits appear to have tightened. Upgrade to biopython 1.73 see issue [#1867](https://github.com/biopython/biopython/issues/1867).
+Numpy *should* work >= 1.16.4 and pandas >= 0.24.2, but install more recent versions if possible. As of December 2018, the NCBI batch query limits have tightened. Upgrade to biopython 1.74 see issue [#1867](https://github.com/biopython/biopython/issues/1867).
 
 ### Memory/System requirements
 
