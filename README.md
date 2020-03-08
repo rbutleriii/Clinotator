@@ -3,7 +3,7 @@
 
 # Clinotator
 ## Synopsis
-### Note: Clinotator v1.4.0 represents a major change for the new xml structure of ClinVar. Several options and descriptions may have changed below. 
+#### Note: Clinotator v1.4.0 represents a major change for the new xml structure of ClinVar. Several options and descriptions may have changed below. 
 ### Clinical interpretation of ambiguous ClinVar annotations
 
 This project takes variants as input and queries NCBI eutilities to generate ClinVar Variation Report<sup>1</sup> scoring metrics. The overall goal is to generate annotations of use for given batches of variants to inform clinical interpretation. The metrics include:
@@ -64,7 +64,7 @@ Implemented in python (tested on 2.7.15 and >=3.5). You can `git clone` or downl
 If you have Anaconda/Miniconda installed on your system, self contained installation can be accomplished quickly with no other modifications. The following will find your conda envs folder, create a clinotator conda environment, and install the repo in it (with a link to source the package only when the conda environment is active).
 ```
 CONDA_ENV=$(conda info --base)/envs/clinotator
-conda create -y -n clinotator py37 biopython pandas
+conda create -y -n clinotator python=3.7 biopython pandas
 git clone https://github.com/rbutleriii/Clinotator.git $CONDA_ENV
 ln -s $CONDA_ENV/Clinotator/clinotator/clinotator.py $CONDA_ENV/bin/clinotator.py
 echo "the path to the test folder is: $CONDA_ENV/Clinotator/test"
@@ -150,7 +150,7 @@ As Clinotator keeps the NCBI xml results in memory, there is a significant memor
 
 <dl>
 	<dt>Clinotator Raw Score (CTRS)</dt>
-	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.10 and practice guidelines receiving a score of 1.25.<br /><br /> The age of the assertion is weighted as new data is incorporated into assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no weight, then there is a 10% reduction in weight per year through 6 years , at which point the penalty stays at a static 50% weight reduction thereafter.<br /><br /> The assertion type is the largest weight, with values of: Benign(B) = -6.46, Likely benign(LB) = -3.23, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 3.23 and Pathogenic(P) = 6.46. The assertion weights have been updated to reflect the distribution of 62,911 well characterized two-star variants in ClinVar as of March 2020. For more information on the weighting calibration decisions, see our publication.<sup>5</sup></dd>
+	<dd>A weighted metric of pathogenicity based on submitter type, assertion type and assertion age. The type of submitter is weighted based on expertise, with regular clinical assertions unweighted at 1.00, expert reviewers receiving a 1.20 and practice guidelines receiving a score of 1.25.<br /><br /> The age of the assertion is weighted as new data is incorporated into assertions as well as previous data, creating a larger set of evidence over time. For the first two years, there is no weight, then there is a 10% reduction in weight per year through 6 years , at which point the penalty stays at a static 50% weight reduction thereafter.<br /><br /> The assertion type is the largest weight, with values of: Benign(B) = -6.46, Likely benign(LB) = -3.23, Uncertain significance(US) = -0.3, Likely pathogenic(LP) = 3.23 and Pathogenic(P) = 6.46. The assertion weights have been updated to reflect the distribution of 62,911 well characterized two-star variants in ClinVar as of March 2020. For more information on the weighting calibration decisions, see our publication.<sup>5</sup></dd>
 </dl>
 <dl>
 	<dt>Average Clinical Assertion Age (CTAA)</dt>
