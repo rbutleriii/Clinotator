@@ -1,10 +1,15 @@
 VID	CVVT	rsID	CVAL	vcfmatch	CVCS	CVSZ	CVNA	CVDS	CVLE	CTRS	CTAA	CTPS	CTRR
 7	Haplotype	118161496	C	['118161496|C', '200401432|A']	Pathogenic	1	1	OMIM:252010(P)	2017-09-01	.	2.0	.	.
 7	Haplotype	200401432	A	['118161496|C', '200401432|A']	Pathogenic	1	1	OMIM:252010(P)	2017-09-01	.	2.0	.	.
-9	single nucleotide variant	1800562	A	.	Conflicting interpretations of pathogenicity, other	1	13	OMIM:235200(P);Not_Provided(P);MedGen:C0392514(P);Orphanet:ORPHA79230(P);MedGen:C0392514(P);MedGen:C0027672(P);HP:HP:0000992(US);HP:HP:0010473(US);OMIM:235200(P);OMIM:235200(P);OMIM:235200(P);OMIM:235200(LP);OMIM:235200(P);OMIM:235200(P)	2019-05-28	58.02	2.5384615384615383	Pathogenic	3
+9	single nucleotide variant	1800562	A	.	Conflicting interpretations of pathogenicity, other	1	13	OMIM:235200(P);Not_Provided(P);MedGen:C0392514(P);Orphanet:ORPHA79230(P);MedGen:C0392514(P);MedGen:C0027672(P);HP:HP:0000992(US);HP:HP:0010473(US);OMIM:235200(P);OMIM:235200(P);OMIM:235200(P);OMIM:235200(LP);OMIM:235200(P);OMIM:235200(P)	2019-05-28	62.482	2.5384615384615383	Pathogenic	3
 11	single nucleotide variant	1800730	T	.	Uncertain significance	2	4	OMIM:104300(US);OMIM:176100(US);OMIM:176200(US);OMIM:235200(US);OMIM:612635(US);OMIM:614193(US);MedGen:C0392514(US);OMIM:235200(US);MedGen:CN517202(US)	2018-12-15	-1.17	1.25	Uncertain significance	0
-14125	single nucleotide variant	267606908	C	.	Pathogenic	3	10	MedGen:CN230736(P);OMIM:160500(P);OMIM:181430(P);OMIM:192600(P);OMIM:255160(P);OMIM:255310(P);OMIM:608358(P);OMIM:613426(P);Not_Provided(P);Orphanet:ORPHA217569(P);OMIM:192600(P);MedGen:C0949658(P);Not_Provided(P);Orphanet:ORPHA217569(P);MedGen:C0949658(P);MedGen:C0007194(P)	2016-12-15	56.28	1.7	Pathogenic	0
-50317	single nucleotide variant	118161496	C	.	Conflicting interpretations of pathogenicity	1	5	Not_Provided(US);Not_Provided(P);MeSH:D030342(P);OMIM:252010(LP);MedGen:CN517202(US)	2017-08-14	11.22	3.0	Pathogenic/Likely pathogenic	3
-127994	Microsatellite	587780147	TGAGATAA	.	Pathogenic	2	2	MedGen:C0027672(P);MeSH:D009386(P);MedGen:C0027672(P)	2016-06-10	7.8	4.5	Likely pathogenic	2
+3521	single nucleotide variant	1801131	G	.	Conflicting interpretations of pathogenicity, other	1	5	Not_Provided(B);MedGen:CN169374(B);Not_Provided(LB);OMIM:601634(B);MedGen:CN517202(US)	2019-05-28	-20.912	2.0	Benign/Likely benign	3
+8178	single nucleotide variant	121909293	T	.	Conflicting interpretations of pathogenicity, risk factor	1	2	OMIM:167800(LP);Not_Provided(LB)	2018-12-14	0.6459999999999999	2.0	Uncertain significance	0
+14125	single nucleotide variant	267606908	C	.	Pathogenic	3	10	MedGen:CN230736(P);OMIM:160500(P);OMIM:181430(P);OMIM:192600(P);OMIM:255160(P);OMIM:255310(P);OMIM:608358(P);OMIM:613426(P);Not_Provided(P);Orphanet:ORPHA217569(P);OMIM:192600(P);MedGen:C0949658(P);Not_Provided(P);Orphanet:ORPHA217569(P);MedGen:C0949658(P);MedGen:C0007194(P)	2016-12-15	61.1116	1.7	Pathogenic	0
+50317	single nucleotide variant	118161496	C	.	Conflicting interpretations of pathogenicity	1	5	Not_Provided(US);Not_Provided(P);MeSH:D030342(P);OMIM:252010(LP);MedGen:CN517202(US)	2017-08-14	12.117	3.0	Pathogenic/Likely pathogenic	3
+55794	single nucleotide variant	180177040	G	.	Likely pathogenic	0	0	.	2016-05-31	.	.	.	.
+127994	Microsatellite	587780147	TGAGATAA	.	Pathogenic	2	2	MedGen:C0027672(P);MeSH:D009386(P);MedGen:C0027672(P)	2016-06-10	8.398	4.5	Likely pathogenic	2
+128294	single nucleotide variant	113288277	T	.	Benign	2	3	Not_Provided(B);Not_Provided(B);MedGen:C3808739(B)	2017-07-28	-14.212	3.6666666666666665	Benign/Likely benign	1
+128297	single nucleotide variant	2465128	G	.	Benign	2	2	Not_Provided(B);Not_Provided(B)	2016-01-19	-7.752000000000001	5.0	Likely benign	2
 214885	single nucleotide variant	200401432	A	.	Uncertain significance	2	2	MeSH:D030342(US);Not_Provided(US)	2017-12-29	-0.54	2.0	Uncertain significance	0
-230850	Microsatellite	587780147	T	.	Pathogenic	2	2	MedGen:C0027672(P);MedGen:C0027672(P)	2018-10-15	11.4	1.5	Pathogenic/Likely pathogenic	1
+225696	single nucleotide variant	1057517686	T	.	Pathogenic/Likely pathogenic	2	2	Not_Provided(LP);Not_Provided(P)	2018-02-08	8.398	2.5	Likely pathogenic	1
