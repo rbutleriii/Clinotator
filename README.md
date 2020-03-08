@@ -3,7 +3,7 @@
 
 # Clinotator
 ## Synopsis
-## Note: Clinotator is currently down, as the ClinVar data at NCBI has changed format. Currently working on a fix.
+### Note: Clinotator v1.4.0 represents a major change for the new xml structure of ClinVar. Several options and descriptions may have changed below. 
 ### Clinical interpretation of ambiguous ClinVar annotations
 
 This project takes variants as input and queries NCBI eutilities to generate ClinVar Variation Report<sup>1</sup> scoring metrics. The overall goal is to generate annotations of use for given batches of variants to inform clinical interpretation. The metrics include:
@@ -59,32 +59,37 @@ While ClinVar has become an indispensable resource for clinical variant interpre
 
 ## Installation
 
-Implemented in python (tested on 2.7.15 and >=3.5). You can `git clone` or download the zipfile and unpack. Add the folder location to your ~/.bash_profile or:
+Implemented in python (tested on 2.7.15 and >=3.5). You can `git clone` or download the zipfile and unpack. Add the folder location to your ~/.bash_profile or `export PATH=$PATH:path/to/folder/Clinotator/clinotator.py`
 
+If you have Anaconda/Miniconda installed on your system, self contained installation can be accomplished quickly with no other modifications. The following will find your conda envs folder, create a clinotator conda environment, and install the repo in it (with a link to source the package only when the conda environment is active).
 ```
-export PATH=$PATH:path/to/folder/Clinotator/clinotator
-``` 
+CONDA_ENV=$(conda info --base)/envs/clinotator
+conda create -y -n clinotator py37 biopython pandas
+git clone https://github.com/rbutleriii/Clinotator.git $CONDA_ENV
+ln -s $CONDA_ENV/Clinotator/clinotator/clinotator.py $CONDA_ENV/bin/clinotator.py
+echo "the path to the test folder is: $CONDA_ENV/Clinotator/test"
+```
 
 Examples of each input file type are provided in the test subfolder. For instance:
 
 ```
-cd path/to/Clinotator/test
+conda activate clinotator
+cd $CONDA_ENV/Clinotator/test
 clinotator.py -t vid -e A.N.Other@example.com test.vid
 ```
 
 Should produce the following warnings and a clinotator.test.tsv file:
 
 ```
+INFO:root:Run date: 2020-03-07
 INFO:root:Starting on test.vid
 INFO:root:Going to download record 1 to 13
-INFO:root:Download time: 0.026888549999997242 min, Batches run -> 1
-WARNING:root:128294 has a missing assertion date!
-WARNING:root:128297 has a missing assertion date!
-WARNING:root:ClinVar significance for 3521 does not include B,B/LB,LB,US,LP,LP/P,P
+INFO:root:Download time: 0.03847670988337389 min, Batches run -> 1
 WARNING:root:VID: 55794 does not have valid clinical assertions!
+INFO:root:file written to clinotator.test.tsv
 ```
 
-The warnings, as well as some additional information can be stored in the log file with `--log`. `--long-log` will store detailed debugging information, but the file will be larger than the output tsv file. Both log files append information, so batch runs or especially large lists of variants may result in large file sizes.
+The warnings, as well as some additional information can be stored in the log file with `--log`. `--long-log` will store detailed debugging information, but the file will be larger than the output tsv file. Both log files append information, so batch runs or especially large lists of variants may result in large log file sizes. Use the output prefix to separate log files for different batches.
 
 ### Dependencies
 
@@ -104,9 +109,9 @@ Numpy *should* work >= 1.16.4 and pandas >= 0.24.2, but install more recent vers
 
 ### Memory/System requirements
 
-Clinotator was designed in a Linux environment and implemented in Python (2.7 or >=3.5), and can run in similar OSX and possibly Windows Python environments. It can be run on a personal computer with relatively modest system requirements; a minimum of 2GB available RAM.  
+Clinotator was designed in a Linux environment and implemented in Python (2.7.15 or >=3.5), and can run in similar OSX and possibly Windows Python environments. It can be run on a personal computer with relatively modest system requirements; a minimum of 2GB available RAM.  
 
-As Clinotator keeps the NCBI xml results in memory, there is a significant memory usage. At the time of writing, the entire ClinVar xml set is approaching 6GB. Loading the entire set into memory is doable with at least 8GB of memory, though it is recommended that you batch your queries in this rare case. More typical usage for subsets of ClinVar or batch vcf annotations should not pose a memory issue.
+As Clinotator keeps the NCBI xml results in memory, there is a significant memory usage. Loading the entire ClinVar database into memory is theoretically doable with at least 16GB of memory, though it is recommended that you batch your queries in this rare case. More typical usage for subsets of ClinVar or batch vcf annotations should not pose a memory issue.
 
 ## Details on metrics
 
@@ -126,11 +131,11 @@ As Clinotator keeps the NCBI xml results in memory, there is a significant memor
 </dl>
 <dl>
 	<dt>ClinVar Conditions/Diseases (CVDS)</dt>
-	<dd>Conditions reported to be associated with this variant.</dd>
+	<dd>Conditions reported to be associated with this variant. Per the new ClinVar database format, this information is limited to LinkOuts to other data (OMIM, MedGen, etc). Descriptions of the conditions are no longer stored in the main XML file.</dd>
 </dl>
 <dl>
 	<dt>ClinVar Alternate Allele (CVAL)</dt>
-	<dd>The alternate allele connected with ClinVar variation report.</dd>
+	<dd>The alternate allele connected with ClinVar variation report. Note that these are left aligned allele definitions, so deletions and insertions have the preceding base (CAA --> C and A --> AC).</dd>
 </dl>
 <dl>
 	<dt>ClinVar Last Evaluated (CVLE)</dt>
@@ -138,7 +143,7 @@ As Clinotator keeps the NCBI xml results in memory, there is a significant memor
 </dl>
 <dl>
 	<dt>ClinVar Variant Type (CVVT)</dt>
-	<dd>The type of variation in ClinVar. Currently defined as either "Simple" with a single AlleleID or "Haplotype" if multiple AlleleIDs are involved.</dd>
+	<dd>The type of variation in ClinVar. The newer ClinVar format defines "copy number gain", "copy number loss", "deletion", "duplication", "indel", "insertion", "inversion", "microsatellite" and "single nucleotide variant" with a single AlleleID or "Haplotype" if multiple AlleleIDs are involved.</dd>
 </dl>
 
 ### Clinotator Metrics
