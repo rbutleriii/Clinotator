@@ -10,7 +10,7 @@ Copyright (C) 2017  Robert R Butler III
 See main, eventually tests will be added for this module
 '''
 
-__version__ = "1.3.2"
+__version__ = "1.4.0"
 
 
 ### getncbi.py global variables 
@@ -69,19 +69,25 @@ star_dict = {'practice guideline': 4,
 
 # dict of reviewer status weights for each assertion
 cutoff = {'practice guideline': 1.25,
-          'reviewed by expert panel': 1.10,
+          'reviewed by expert panel': 1.20,
           'criteria provided, single submitter': 1.0,
           'no assertion for the individual variant': 0.0,
           'no assertion criteria provided': 0.0,
           'no assertion provided': 0.0}
 
 # dict of assertion weights for scoring
-significance = {'Benign': (-6, 'B'),
-                'Likely benign': (-3, 'LB'),
+significance = {'Benign': (-6.46, 'B'),
+                'benign': (-6.46, 'B'), # submission key error
+                'Likely benign': (-3.23, 'LB'),
+                'likely benign': (-3.23, 'LB'),
+                'Likely Benign': (-3.23, 'LB'), # submission key error
                 'Uncertain significance': (-0.3, 'US'),
-                'Uncertain Significance': (-0.3, 'US'),
-                'Likely pathogenic': (3, 'LP'),
-                'Pathogenic': (6, 'P'),
+                'Uncertain Significance': (-0.3, 'US'), # submission key error
+                'Likely pathogenic': (3.23, 'LP'),
+                'likely pathogenic': (3.23, 'LP'),
+                'Likely Pathogenic': (3.23, 'LP'), # submission key error
+                'Pathogenic': (6.46, 'P'),
+                'pathogenic': (6.46, 'P'), # submission key error
                 'drug response': (0, '-'), 'association': (0, '-'),
                 'risk factor': (0, '-'), 'protective': (0, '-'),
                 'Affects': (0, '-'),
@@ -89,11 +95,11 @@ significance = {'Benign': (-6, 'B'),
                 'other': (0, '-'), 'not provided': (0, '-')}
 
 # list of weighted score upper bounds for ctps bins
-ctps_cutoffs = [('Benign', -26.7),
+ctps_cutoffs = [('Benign', -21.318), # lower PI bound for LB
                 ('Benign/Likely benign', -8.4),
                 ('Likely benign', -4.2),
                 ('Uncertain significance', 4.2),
                 ('Likely pathogenic', 8.4),
-                ('Pathogenic/Likely pathogenic', 14.7),
+                ('Pathogenic/Likely pathogenic', 14.858), # upper PI for LP
                 ('Pathogenic', 10000000)]
 

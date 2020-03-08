@@ -48,7 +48,8 @@ def getargs():
                             description='Clinical interpretation of ambiguous'
                                         ' ClinVar annotations')
     parser.add_argument('--log', action='store_true', help='create logfile')
-    parser.add_argument('--long-log', action='store_true', help='create detailed logfile')
+    parser.add_argument('--long-log', action='store_true',
+                        help='create detailed logfile')
     parser.add_argument('-o', metavar='prefix', dest='outprefix',
                         default='clinotator',
                         help='choose an alternate prefix for outfiles')
@@ -85,12 +86,13 @@ def input_selection(file_type, file, outprefix, query_results):
         with open(file) as f:
 
             if file_type == 'vid':
-                id_list = np.unique([line.rstrip('\n') for line in f])
+                id_list = np.unique([line.rstrip('\r\n') for line in f])
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
                 return False
         
             elif file_type == 'rsid':
-                id_list = np.unique([line.lstrip('rsRS').rstrip('\n') for line in f])
+                id_list = np.unique([line.lstrip('rsRS')
+                                     .rstrip('\r\n') for line in f])
                 getncbi.get_ncbi_xml(file_type, id_list, query_results)
                 return False
             
@@ -125,7 +127,7 @@ def explode(df, lst_cols, fill_value=''):
             col:np.repeat(df[col].values, df[lst_cols[0]].str.len())
             for col in idx_cols
         }).assign(**{col:np.concatenate(df[col].values) for col in lst_cols}) \
-          .loc[:, df.columns]
+                .loc[:, df.columns]
     else:
         # at least one list in cells is empty
         return pd.DataFrame({

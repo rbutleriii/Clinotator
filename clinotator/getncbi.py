@@ -129,7 +129,7 @@ def batch_local(file_type, query_type, id_list, **kwargs):
         fetch_handle.close()
         try:
             result_list.extend(
-                    [link['Id'] for link in record[0]['LinkSetDb'][0]['Link']])
+                    [lnk['Id'] for lnk in record[0]['LinkSetDb'][0]['Link']])
         except IndexError:
             logging.info('No VIDs for rsIDs {} to {}'.format(start + 1, end))
             pass
