@@ -20,7 +20,7 @@ annotate, so types are documented here instead):
     ctps_cutoffs: List[Tuple[str, float]]
 '''
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 
 
 ### getncbi.py global variables 
