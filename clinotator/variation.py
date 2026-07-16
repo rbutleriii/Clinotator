@@ -16,14 +16,24 @@ import datetime
 import warnings
 import decimal
 from math import fsum
+from typing import List, Optional
 import numpy as np
 import xml.etree.ElementTree as ET
 import global_vars as g
 
 
-# work through batch queries from ncbi and build list of variant objects
-def query_parsing(variant_objects, query_results):
-    
+def query_parsing(
+        variant_objects: List['VariationClass'],
+        query_results: List[str]) -> None:
+    """Parse each ClinVar XML batch into ``VariationClass`` objects.
+
+    Args:
+        variant_objects: List to be populated in-place with one
+            ``VariationClass`` per variation report found across all
+            batches.
+        query_results: Raw ClinVar XML text, one string per batch, as
+            produced by ``getncbi.get_ncbi_xml``.
+    """
     for batch_index, batch in enumerate(query_results):
         clinvarresult = ET.fromstring(batch)
         for var_index, variationreport in enumerate(clinvarresult):
@@ -32,16 +42,33 @@ def query_parsing(variant_objects, query_results):
         logging.debug('{} variant objects parsed in batch {}'
                       .format(var_index + 1, batch_index + 1))
 
-# calculate the age of each individual assertion
-def calculate_age(datestring):
+def calculate_age(datestring: str) -> int:
+    """Calculate the age in whole years since a given date.
+
+    Args:
+        datestring: A date in ``'%Y-%m-%d'`` format, e.g. the assertion's
+            ``DateLastEvaluated``.
+
+    Returns:
+        The number of full years elapsed between ``datestring`` and today.
+    """
     born = datetime.datetime.strptime(datestring, '%Y-%m-%d')
     today = datetime.date.today()
     return today.year - born.year - ((today.month, today.day) < (born.month,
                                                                  born.day))
 
-# calculate age weight of each assertion
-def age_weight(age):
+def age_weight(age: int) -> float:
+    """Compute the age-based weight applied to a clinical assertion.
 
+    More recent assertions are weighted more heavily than older ones.
+
+    Args:
+        age: Age of the assertion in years, as from ``calculate_age``.
+
+    Returns:
+        ``1.0`` for age < 2, a linearly decreasing weight from just under
+        1.0 down to 0.5 for age in [2, 7), and ``0.5`` for age >= 7.
+    """
     if age < 2:
         return 1
     elif 2 <= age < 7:
@@ -49,8 +76,17 @@ def age_weight(age):
     elif age >= 7:
         return 0.5
 
-# when using a list of ages, catch empty list and return average age
-def average_list_age(vid, age_list):
+def average_list_age(vid: str, age_list: List[int]) -> Optional[float]:
+    """Average a list of assertion ages, tolerating an empty list.
+
+    Args:
+        vid: The variant's ClinVar Variation ID, used only for logging.
+        age_list: Ages (in years) of the variant's qualifying clinical
+            assertions.
+
+    Returns:
+        The mean age, or ``None`` if ``age_list`` is empty.
+    """
     #numpy RuntimeWarning for empty age_list, suppress warning and log 
     with warnings.catch_warnings():
         warnings.simplefilter('error', category=RuntimeWarning)
@@ -63,17 +99,45 @@ def average_list_age(vid, age_list):
                           .format(vid))
             return None
 
-# try a key to see if it is in the dict or warn
-def key_test(test_dict, test_key):
-    
+def key_test(test_dict: dict, test_key: str):
+    """Look up a key in a dict, logging and re-raising on ``KeyError``.
+
+    Args:
+        test_dict: The dict to look up ``test_key`` in (e.g.
+            ``global_vars.cutoff`` or ``global_vars.significance``).
+        test_key: The key to look up.
+
+    Returns:
+        The value at ``test_dict[test_key]``.
+
+    Raises:
+        KeyError: If ``test_key`` is not present in ``test_dict``.
+    """
     try:
         return test_dict[test_key]
     except KeyError:
         logging.warning('{} is not an expected key'.format(test_key))
         raise KeyError
 
-# evaluates reclassification recommendation for CTRR
-def reclassification_tree(ctps_index, cvcs_index):    
+def reclassification_tree(ctps_index: int, cvcs_index: int) -> Optional[int]:
+    """Score how strongly a variant's evidence suggests reclassification.
+
+    Compares the bin index of the Clinotator-predicted significance
+    (CTPS) against the bin index of ClinVar's submitted clinical
+    significance (CVCS) to produce a reclassification-recommendation
+    score.
+
+    Args:
+        ctps_index: Index of the variant's Clinotator Predicted
+            Significance within ``global_vars.ctps_cutoffs``.
+        cvcs_index: Index of the variant's ClinVar clinical significance
+            within ``global_vars.ctps_cutoffs``.
+
+    Returns:
+        An integer score from 0 (no discordance) to 3 (highest-priority
+        discordance), or ``None`` if the index difference and category
+        combination don't match any defined case.
+    """
     index_diff = abs(ctps_index - cvcs_index)
     
     if index_diff == 0:
@@ -103,8 +167,45 @@ def reclassification_tree(ctps_index, cvcs_index):
                 
 
 class VariationClass:
-    
-    def __init__(self, variationreport):
+    """Parsed ClinVar variation report with derived Clinotator metrics.
+
+    Each instance represents a single ClinVar Variation ID, with
+    attributes populated from the raw XML (e.g. ``VID``, ``CVCS``) as well
+    as Clinotator's own derived scoring metrics (e.g. ``CTRS``, ``CTPS``).
+
+    Attributes:
+        VID (str): ClinVar Variation ID.
+        CVVT (str): ClinVar variant type.
+        CVSZ (int): ClinVar review-status star rating.
+        rsID (List[str]): dbSNP rsID(s) associated with the variant.
+        CVAL (List[str]): GRCh38 alternate allele(s).
+        vcfmatch (Union[List[str], str]): ``'rsid|allele'`` pairs, or
+            ``'.'`` if there is only one allele.
+        CVCS (str): ClinVar clinical significance description.
+        CVLE (str): Date the ClinVar interpretation was last evaluated,
+            or ``'.'`` if not available.
+        CVDS (str): Semicolon-joined disease/phenotype terms with their
+            per-assertion significance codes.
+        CVNA (int): Number of qualifying (germline, criteria-provided)
+            clinical assertions.
+        CTAA (Optional[float]): Average age (years) of qualifying clinical
+            assertions.
+        CTRS (Optional[float]): Clinotator raw weighted pathogenicity
+            score, or ``None`` if fewer than 2 qualifying assertions.
+        CTPS (Optional[str]): Clinotator-predicted clinical significance
+            bin.
+        CTRR (Union[int, str]): Reclassification recommendation score, or
+            ``'.'`` if not computable.
+    """
+
+    def __init__(self, variationreport: ET.Element) -> None:
+        """Parse one ClinVar ``VariationArchive`` element into attributes.
+
+        Args:
+            variationreport: An ``xml.etree.ElementTree.Element`` for a
+                single ClinVar variation report (one child of the batch
+                root element).
+        """
         self.VID = variationreport.attrib['VariationID']
         self.CVVT = variationreport.attrib['VariationType']
         revstat = variationreport.find('.InterpretedRecord/ReviewStatus').text
@@ -114,16 +215,33 @@ class VariationClass:
         self.assertion_table_stats(variationreport)
         self.analysis_stats()
 
-    # deal with Haplotypes
-    def haplos(self, variationreport):
+    def haplos(self, variationreport: ET.Element) -> str:
+        """Choose the XPath for this report's alleles, handling haplotypes.
+
+        Args:
+            variationreport: The variation report element for this
+                variant.
+
+        Returns:
+            An XPath string locating the ``SimpleAllele`` element(s),
+            accounting for the extra ``Haplotype`` level present when
+            ``self.CVVT == "Haplotype"``.
+        """
         if self.CVVT == "Haplotype":
             all_term = '.InterpretedRecord/Haplotype/SimpleAllele'
         else:
             all_term = '.InterpretedRecord/SimpleAllele'
         return all_term
 
-    # parse the Allele subtree of variation report
-    def allele_parse(self, variationreport):
+    def allele_parse(self, variationreport: ET.Element) -> None:
+        """Parse allele-level fields (rsID, ALT allele) from the report.
+
+        Populates ``self.rsID``, ``self.CVAL``, and ``self.vcfmatch``.
+
+        Args:
+            variationreport: The variation report element for this
+                variant.
+        """
         RS = []
         Alt = []
         vcf_match = []
@@ -155,8 +273,17 @@ class VariationClass:
         else:
             self.vcfmatch = '.'
 
-    # parse the ObservationList subtree of variation report
-    def observation_parse(self, variationreport):
+    def observation_parse(self, variationreport: ET.Element) -> None:
+        """Parse the clinical-significance interpretation for the variant.
+
+        Populates ``self.CVCS`` and ``self.CVLE``. Warns and skips
+        additional clinical-significance interpretation blocks if more
+        than one is present, since that indicates an annotation error.
+
+        Args:
+            variationreport: The variation report element for this
+                variant.
+        """
         run_already = False
 
         for interpretation in variationreport \
@@ -184,8 +311,20 @@ class VariationClass:
             else:
                 continue
         
-    # parse the PhenotypeList subtree of variation report
-    def pheno_parse(self, assertion, sig_key):
+    def pheno_parse(self, assertion: ET.Element, sig_key: str) -> List[str]:
+        """Build disease/phenotype labels for one clinical assertion.
+
+        Args:
+            assertion: A ``ClinicalAssertion`` element from the variation
+                report.
+        sig_key: The short significance code (e.g. ``'P'``, ``'LB'``) to
+                annotate each phenotype term with.
+
+        Returns:
+            A list of ``'DB:ID(sig_key)'`` strings, one per associated
+            phenotype/trait; or a single ``'Not_Provided(sig_key)'`` entry
+            if the assertion lists no phenotype cross-references.
+        """
         pheno_list = []
         
         for phenotype in assertion.findall('./TraitSet/Trait/XRef'):
@@ -198,8 +337,19 @@ class VariationClass:
                                                        pheno_list))
         return pheno_list
 
-    # parse the ClinicalAssertionList subtree of variation report
-    def assertion_table_stats(self, variationreport):
+    def assertion_table_stats(self, variationreport: ET.Element) -> None:
+        """Score qualifying clinical assertions and aggregate the results.
+
+        Iterates over each ``ClinicalAssertion`` for this variant,
+        filters to germline-origin assertions with valid review status
+        and significance, and computes a weighted raw score per
+        assertion. Populates ``self.CVDS``, ``self.CVNA``, ``self.CTAA``,
+        and ``self.CTRS``.
+
+        Args:
+            variationreport: The variation report element for this
+                variant.
+        """
         raw_score = []
         age_list = []
         cvds_list = []
@@ -266,9 +416,16 @@ class VariationClass:
             logging.debug('VID: {} has fewer than 2 complete assertions, no C'
                           'TRS will be generated'.format(self.VID))
 
-    # calculating the analytical stats: CTPS, CTRR.
-    def analysis_stats(self):
-        
+    def analysis_stats(self) -> None:
+        """Compute the Clinotator Predicted Significance and CTRR.
+
+        Requires ``self.CTRS``/``self.CVNA`` to already be set (by
+        ``assertion_table_stats``). Populates ``self.CTPS`` and
+        ``self.CTRR``, or sets both to their "not computable" values
+        (``None`` and ``'.'`` respectively) if there are too few
+        assertions or the ClinVar significance doesn't map to a known
+        bin.
+        """
         if self.CVNA < 2:
             self.CTPS = None
             self.CTRR = '.'

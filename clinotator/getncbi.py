@@ -11,6 +11,7 @@ See main, eventually tests will be added for this module
 import logging
 import sys
 import time
+from typing import Any, List, Tuple
 import Bio.Entrez as Entrez
 import global_vars as g
 try:
@@ -21,15 +22,38 @@ except ImportError:
 
 Entrez.tool = g.etool
 
-# timing compatibility with python2
-def timing_tool():
+def timing_tool() -> float:
+    """Get a monotonic timestamp, compatible with Python 2 and 3.
+
+    Returns:
+        A timestamp in fractional seconds from ``time.perf_counter`` (or
+        ``time.time`` as a Python 2 fallback). Only meaningful relative to
+        another call to this function.
+    """
     try:
         return time.perf_counter()
     except:
         return time.time()
 
-# http attempts loop for biopython, assumes Bio.Entrez as Entrez
-def http_attempts(query_type, **kwargs):
+def http_attempts(query_type: str, **kwargs: Any) -> Any:
+    """Call a Bio.Entrez function, retrying on transient HTTP errors.
+
+    Args:
+        query_type: Name of the ``Bio.Entrez`` function to call (e.g.
+            ``'epost'``, ``'efetch'``, ``'elink'``).
+        **kwargs: Keyword arguments forwarded to the ``Bio.Entrez``
+            function.
+
+    Returns:
+        The open handle returned by the successful ``Bio.Entrez`` call.
+
+    Raises:
+        HTTPError: Re-raised for HTTP error codes other than 400, 429, or
+            5xx, which are retried instead.
+
+    Note:
+        Exits the process via ``sys.exit()`` if all 4 attempts fail.
+    """
     for attempt in range(4): # HTTPError and retry three times
         try:
             fetch_handle = getattr(Entrez, query_type)(**kwargs)
@@ -60,9 +84,24 @@ def http_attempts(query_type, **kwargs):
         sys.exit()
     return fetch_handle
 
-# epost list to e-utilities history server for target db.
-# Can't elink over 1000, no max on epost
-def post_ncbi(file_type, query_type, **kwargs):
+def post_ncbi(
+        file_type: str,
+        query_type: str,
+        **kwargs: Any) -> Tuple[str, str]:
+    """Submit a query to NCBI and retrieve its history-server reference.
+
+    Args:
+        file_type: One of ``'vid'``, ``'rsid'``, or ``'vcf'``; used only to
+            select how the response is unpacked.
+        query_type: Name of the ``Bio.Entrez`` function to call, e.g.
+            ``'epost'`` or ``'elink'``.
+        **kwargs: Keyword arguments forwarded to the ``Bio.Entrez``
+            function.
+
+    Returns:
+        A ``(webenv, query_key)`` tuple identifying the posted query on
+        NCBI's history server, for use in later batched efetch/elink calls.
+    """
     logging.debug('{} to ncbi using kwargs: {}'.format(query_type, kwargs))
     fetch_handle = http_attempts(query_type, **kwargs)
     query = Entrez.read(fetch_handle)
@@ -79,8 +118,23 @@ def post_ncbi(file_type, query_type, **kwargs):
                   .format(webenv, query_key))
     return webenv, query_key
     
-# Utilized for batch efetch/esummary from ncbi using history server.
-def batch_ncbi(query_type, query_results, id_list, **kwargs):
+def batch_ncbi(
+        query_type: str,
+        query_results: List[str],
+        id_list: List[str],
+        **kwargs: Any) -> None:
+    """Fetch records from NCBI in batches, using the history server.
+
+    Args:
+        query_type: Name of the ``Bio.Entrez`` function to call, typically
+            ``'efetch'``.
+        query_results: List to be populated in-place with each batch's raw
+            response text.
+        id_list: The full list of IDs being fetched; only its length is
+            used, to compute batch boundaries.
+        **kwargs: Keyword arguments forwarded to the ``Bio.Entrez`` function
+            (e.g. ``db``, ``rettype``, ``webenv``, ``query_key``).
+    """
     count = len(id_list)
 
     time.sleep(0.35)
@@ -106,10 +160,32 @@ def batch_ncbi(query_type, query_results, id_list, **kwargs):
         fetch_handle.close()
     return
 
-# batch the queries locally, then epost->etuility.
-# elink can't handle batch size > 1000, and doesn't support retstart,retmax.
-# this is then the only way to epost -> elink,egquery,etc.
-def batch_local(file_type, query_type, id_list, **kwargs):
+def batch_local(
+        file_type: str,
+        query_type: str,
+        id_list: List[str],
+        **kwargs: Any) -> List[str]:
+    """Locally batch an ID list, then epost each batch before querying.
+
+    ``elink`` can't handle a batch size over 1000 and doesn't support
+    ``retstart``/``retmax``, so this is the only way to run ``elink``,
+    ``egquery``, etc. over a large ID list: batch locally, then
+    epost -> query for each batch.
+
+    Args:
+        file_type: One of ``'vid'``, ``'rsid'``, or ``'vcf'``; forwarded to
+            ``post_ncbi`` to control response unpacking.
+        query_type: Name of the ``Bio.Entrez`` function to call after
+            posting each batch, typically ``'elink'``.
+        id_list: Full list of IDs (e.g. rsIDs) to look up.
+        **kwargs: Keyword arguments forwarded to ``post_ncbi`` (for the
+            epost call) and to ``http_attempts`` (for the query call),
+            e.g. ``dbfrom``, ``db``, ``linkname``.
+
+    Returns:
+        The combined list of linked IDs (e.g. ClinVar VIDs) found for all
+        batches of ``id_list``.
+    """
     count = len(id_list)
     logging.debug('total rsIDs to post: {}'.format(count))
     result_list = []
@@ -138,9 +214,23 @@ def batch_local(file_type, query_type, id_list, **kwargs):
         time.sleep(0.35)
     return result_list
 
-# getting xml variation files for query_results list, 
-# main
-def get_ncbi_xml(file_type, id_list, query_results):
+def get_ncbi_xml(
+        file_type: str,
+        id_list: List[str],
+        query_results: List[str]) -> None:
+    """Resolve IDs to ClinVar VIDs (if needed) and fetch their XML records.
+
+    This is the main entry point of this module: given a list of vid or
+    rsid identifiers, it resolves them to ClinVar Variation IDs if
+    necessary, then downloads the corresponding ClinVar variation-report
+    XML in batches.
+
+    Args:
+        file_type: One of ``'rsid'`` or ``'vid'``.
+        id_list: The list of identifiers to resolve/fetch.
+        query_results: List to be populated in-place with raw ClinVar XML
+            responses fetched from NCBI.
+    """
     logging.debug('{} list -> {}'.format(file_type, id_list))
     start = timing_tool()
     staging_list = []

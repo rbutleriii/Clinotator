@@ -8,9 +8,19 @@ Clinotator - Clinical interpretation of ambiguous ClinVar annotations
 Copyright (C) 2017  Robert R Butler III
 
 See main, eventually tests will be added for this module
+
+Type reference for the constants below (this module has no functions to
+annotate, so types are documented here instead):
+    __version__: str
+    elink_batch, efetch_batch, max_vcf_header_size: int
+    etool: str
+    new_headers: List[str]
+    star_dict, cutoff: Dict[str, int] / Dict[str, float]
+    significance: Dict[str, Tuple[float, str]]
+    ctps_cutoffs: List[Tuple[str, float]]
 '''
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 
 
 ### getncbi.py global variables 

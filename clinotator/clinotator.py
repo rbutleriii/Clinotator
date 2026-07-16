@@ -24,6 +24,7 @@ import argparse
 import logging
 import sys
 import datetime
+from typing import List, Union
 import pandas as pd
 import numpy as np
 import Bio.Entrez as Entrez
@@ -35,13 +36,25 @@ import global_vars as g
 
 __version__ = g.__version__
 
-# error logging function plus config
-def error_handling():
+def error_handling() -> str:
+    """Format the currently-handled exception for logging.
+
+    Must be called from within an ``except`` block, since it reads the
+    exception info of the exception currently being handled.
+
+    Returns:
+        A message with the exception type, message, and line number.
+    """
     return ' {}. {}, line: {}'.format(sys.exc_info()[0], sys.exc_info()[1],
                                       sys.exc_info()[2].tb_lineno)
 
-# argparse function
-def getargs():
+def getargs() -> argparse.Namespace:
+    """Define and parse the command-line arguments for clinotator.py.
+
+    Returns:
+        The parsed arguments, including ``input``, ``type``, ``email``,
+        ``outprefix``, ``log``, and ``long_log``.
+    """
     parser = argparse \
             .ArgumentParser(prog='clinotator.py',
                             formatter_class=argparse.RawTextHelpFormatter,
@@ -69,8 +82,15 @@ def getargs():
                                     'vcf - vcf file (output vcf generated)')
     return parser.parse_args()
 
-# choosing log options
-def log_opts(log, long_log, outprefix):
+def log_opts(log: bool, long_log: bool, outprefix: str) -> None:
+    """Configure the logging module based on the chosen CLI log options.
+
+    Args:
+        log: If True, write INFO-level logs to ``{outprefix}.log``.
+        long_log: If True, write DEBUG-level logs to ``{outprefix}.log``.
+            Takes effect only when ``log`` is False.
+        outprefix: Prefix used to build the log file name.
+    """
     if log:
         logging.basicConfig(level=logging.INFO,
                             filename="{}.log".format(outprefix))
@@ -80,8 +100,25 @@ def log_opts(log, long_log, outprefix):
     else:
         logging.basicConfig(level=logging.INFO)
 
-# how to handle file types, returns vcf_tbl or False for output 
-def input_selection(file_type, file, outprefix, query_results):
+def input_selection(
+        file_type: str,
+        file: str,
+        outprefix: str,
+        query_results: List[str]) -> Union[pd.DataFrame, bool]:
+    """Read an input file and dispatch it to the right NCBI query routine.
+
+    Args:
+        file_type: One of ``'vid'``, ``'rsid'``, or ``'vcf'``.
+        file: Path to the input file.
+        outprefix: Prefix used for any files written during vcf processing.
+        query_results: List to be populated in-place with raw ClinVar XML
+            responses fetched from NCBI.
+
+    Returns:
+        The parsed vcf table (``pandas.DataFrame``) if ``file_type`` is
+        ``'vcf'``, otherwise ``False``. Returns ``None`` if the file could
+        not be opened or another exception occurred.
+    """
     try:
         with open(file) as f:
 
@@ -109,9 +146,26 @@ def input_selection(file_type, file, outprefix, query_results):
     except:
         logging.critical(error_handling())
 
-# exploding list cells in dataframe into separate rows.
-# function courtesy of @MaxU on stackoverflow question-12680754
-def explode(df, lst_cols, fill_value=''):
+def explode(
+        df: pd.DataFrame,
+        lst_cols: Union[str, List[str]],
+        fill_value: str = '') -> pd.DataFrame:
+    """Explode list-valued cells in a DataFrame into separate rows.
+
+    Function courtesy of @MaxU on stackoverflow question-12680754.
+
+    Args:
+        df: Source DataFrame containing one or more columns of lists.
+        lst_cols: Column name, or list of column names, whose list values
+            should be exploded in lockstep (all given columns must have
+            lists of the same length per row).
+        fill_value: Value used to fill columns for rows where the list in
+            ``lst_cols[0]`` was empty.
+
+    Returns:
+        A new DataFrame with one row per list element, in the original
+        column order.
+    """
     # make sure `lst_cols` is a list
     if lst_cols and not isinstance(lst_cols, list):
         lst_cols = [lst_cols]
@@ -137,8 +191,20 @@ def explode(df, lst_cols, fill_value=''):
           .append(df.loc[lens==0, idx_cols]).fillna(fill_value) \
           .loc[:, df.columns]
 
-# outfile generation with vcf option
-def output_files(vcf_tbl, variant_objects, outprefix):
+def output_files(
+        vcf_tbl: Union[pd.DataFrame, bool],
+        variant_objects: List['variation.VariationClass'],
+        outprefix: str) -> None:
+    """Write the per-variant results table, and an annotated vcf if given.
+
+    Args:
+        vcf_tbl: The vcf DataFrame produced by ``vcf.vcf_prep``, or ``False``
+            if the input was not a vcf file.
+        variant_objects: Parsed ``VariationClass`` instances, one per
+            variant, used to build the output table.
+        outprefix: Prefix used for the ``{outprefix}.tsv`` and, if
+            applicable, ``{outprefix}.anno.vcf`` output files.
+    """
     columnz = ['VID', 'CVVT', 'rsID', 'CVAL', 'vcfmatch', 'CVCS', 'CVSZ',
                'CVNA', 'CVDS', 'CVLE', 'CTRS', 'CTAA', 'CTPS', 'CTRR']
 
@@ -163,7 +229,13 @@ def output_files(vcf_tbl, variant_objects, outprefix):
     return
     
 
-def main():
+def main() -> None:
+    """Run the Clinotator CLI: parse args, query NCBI, and write results.
+
+    Iterates over every input file given on the command line, queries
+    NCBI/ClinVar for each, computes Clinotator metrics, and writes a
+    ``.tsv`` (and, for vcf input, an annotated ``.anno.vcf``) per file.
+    """
     args = getargs()
     log_opts(args.log, args.long_log, args.outprefix)
     logging.info('Run date: {}'

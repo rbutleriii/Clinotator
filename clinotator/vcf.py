@@ -13,18 +13,44 @@ import re
 import logging
 import sys
 import datetime
+from typing import IO, List, Tuple
 import pandas as pd
 import global_vars as g
 
 
-# error logging function plus config
-def error_handling():
+def error_handling() -> str:
+    """Format the currently-handled exception for logging.
+
+    Must be called from within an ``except`` block, since it reads the
+    exception info of the exception currently being handled.
+
+    Returns:
+        A message with the exception type, message, and line number.
+    """
     return ' {}. {}, line: {}'.format(sys.exc_info()[0], sys.exc_info()[1],
                                       sys.exc_info()[2].tb_lineno)
 
-# generates header for outfile, also counts input info and header lines
-def parse_header(file_object, outprefix):
+def parse_header(file_object: IO[str], outprefix: str) -> int:
+    """Copy and extend a vcf header into the annotated output vcf.
 
+    Reads header lines from the input vcf, inserts Clinotator's INFO field
+    definitions just after the existing INFO definitions, adds a
+    Clinotator run-metadata line, and writes the result to
+    ``{outprefix}.anno.vcf``.
+
+    Args:
+        file_object: Open file handle for the input vcf, positioned at the
+            start of the file. Its read cursor is reset to 0 before this
+            function returns.
+        outprefix: Prefix used to build the ``{outprefix}.anno.vcf`` output
+            file name.
+
+    Returns:
+        The number of header lines read from the input file (used by the
+        caller to know how many rows to skip when reading the body with
+        pandas). Returns ``None`` if the file could not be opened or
+        another exception occurred.
+    """
     try:
         with open('{}.anno.vcf'.format(outprefix), 'w') as outfile:
             header = []
@@ -59,8 +85,22 @@ def parse_header(file_object, outprefix):
     except:
         logging.fatal(error_handling())
 
-# process input vcf file, return rsids for query and vcf_tbl for output
-def vcf_prep(file_object, outprefix):
+def vcf_prep(
+        file_object: IO[str],
+        outprefix: str) -> Tuple[List[str], pd.DataFrame]:
+    """Write the annotated-vcf header and load the vcf body into a table.
+
+    Args:
+        file_object: Open file handle for the input vcf, positioned at the
+            start of the file.
+        outprefix: Prefix used to build the ``{outprefix}.anno.vcf`` output
+            file name (via ``parse_header``).
+
+    Returns:
+        A ``(vcf_list, vcf_tbl)`` tuple: ``vcf_list`` is the list of
+        non-missing variant IDs (rsIDs) from the vcf ``ID`` column, and
+        ``vcf_tbl`` is the full vcf body as a DataFrame of strings.
+    """
     header_count = parse_header(file_object, outprefix)
     vcf_tbl = pd.read_csv(file_object, sep='\t', skiprows=header_count,
                           dtype=str)
@@ -68,8 +108,30 @@ def vcf_prep(file_object, outprefix):
     vcf_list = vcf_tbl.ID.values[vcf_tbl.ID.values != '.'].tolist()
     return vcf_list, vcf_tbl
 
-# concatenates new info into variants that match rsid and alt
-def cat_info_column(info, rsid, alt, out_tbl):
+def cat_info_column(
+        info: str,
+        rsid: str,
+        alt: str,
+        out_tbl: pd.DataFrame) -> str:
+    """Append Clinotator annotations to a vcf record's INFO field.
+
+    Looks up the given rsID/alt-allele combination in the Clinotator
+    results table and, if found, appends the corresponding Clinotator
+    fields to the existing INFO string.
+
+    Args:
+        info: The existing INFO field string for this vcf record.
+        rsid: The record's variant ID (e.g. ``'rs12345'``), as found in the
+            vcf ``ID`` column.
+        alt: The record's comma-separated ALT allele string.
+        out_tbl: The Clinotator results table (as produced by
+            ``clinotator.output_files``/``clinotator.explode``) to search
+            for a matching rsID/allele.
+
+    Returns:
+        The INFO string with Clinotator fields appended if a match was
+        found, otherwise the original ``info`` string unchanged.
+    """
     rsid_match = rsid.lstrip('rs')
     alt_list = alt.split(",")
     info_tbl = pd.DataFrame()
